@@ -1,8 +1,14 @@
 {
   "name": "dbf-monorepo",
   "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "build:core": "cd packages/dbf-core && npm run build",
-    "dev:core": "cd packages/dbf-core && npm run dev"
+    "dev:core": "cd packages/dbf-core && npm run dev",
+    "build:router": "cd packages/dbf-router && npm run build",
+    "dev:router": "cd packages/dbf-router && npm run dev"
   }
 }

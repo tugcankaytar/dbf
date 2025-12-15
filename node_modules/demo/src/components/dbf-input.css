@@ -1,0 +1,25 @@
+:host {
+  display: block;
+  font: 14px system-ui;
+  padding: 12px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+input {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font: inherit;
+}
+
+.value {
+  color: #555;
+  font-size: 12px;
+}
+
+
