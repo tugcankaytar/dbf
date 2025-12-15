@@ -1,31 +1,31 @@
 import { defineComponent } from "dbf-core";
 import styles from "./home-stats.css?inline";
+import imageUrl from "../../public/vite.svg";
+import { getStrings } from "../middlewares/language";
 
 defineComponent("home-stats", {
   styles,
   render({ html }) {
+    const dict = getStrings().homeStats;
+    const items = dict.items as Array<{ label: string; value: string; hint: string }>;
+
     return html`
       <section class="stats">
         <div class="stats-grid">
-          <dbf-stat
-            label="Lightweight"
-            value="< 5 KB"
-            hint="Core runtime, minified & gzip"
-          ></dbf-stat>
-          <dbf-stat
-            label="Native"
-            value="0 abstractions"
-            hint="Built on top of Custom Elements"
-          ></dbf-stat>
-          <dbf-stat
-            label="DX"
-            value="Type-safe"
-            hint="Typed props, state helpers, events"
-          ></dbf-stat>
+          ${items
+            .map(
+              (item) => html`
+                <dbf-stat
+                  label="${item.label}"
+                  value="${item.value}"
+                  hint="${item.hint}"
+                  imageUrl="${imageUrl}"
+                ></dbf-stat>
+              `
+            )
+            .join("")}
         </div>
       </section>
     `;
   },
 });
-
-

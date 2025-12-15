@@ -146,7 +146,8 @@ function define(tag, ctor) {
 // src/dom/html.ts
 function html(strings, ...values) {
   let out = "";
-  for (let i = 0; i < strings.length; i++) out += strings[i] + (values[i] ?? "");
+  for (let i = 0; i < strings.length; i++)
+    out += strings[i] + (values[i] ?? "");
   return out;
 }
 
@@ -194,12 +195,92 @@ function defineComponent(tag, options) {
   }
   define(tag, Impl);
 }
+
+// src/errors/global.ts
+var DEFAULT_BANNER_ID = "dbf-core-global-error-banner";
+function resolveDocument(root) {
+  if (typeof window === "undefined") return null;
+  if (!root) return window.document;
+  if (root instanceof window.Document) return root;
+  return root.ownerDocument ?? window.document;
+}
+function ensureBanner(doc, id) {
+  let el = doc.querySelector(`#${id}`);
+  if (el) return el;
+  el = doc.createElement("div");
+  el.id = id;
+  el.style.position = "fixed";
+  el.style.insetInline = "0";
+  el.style.bottom = "0";
+  el.style.zIndex = "9999";
+  el.style.padding = "0.75rem 1.5rem";
+  el.style.display = "flex";
+  el.style.justifyContent = "space-between";
+  el.style.alignItems = "center";
+  el.style.gap = "0.75rem";
+  el.style.background = "rgba(127, 29, 29, 0.95)";
+  el.style.color = "#fee2e2";
+  el.style.fontFamily = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+  el.style.fontSize = "0.9rem";
+  const msg = doc.createElement("span");
+  msg.id = `${id}-message`;
+  const closeBtn = doc.createElement("button");
+  closeBtn.textContent = "Dismiss";
+  closeBtn.style.border = "1px solid rgba(248, 250, 252, 0.4)";
+  closeBtn.style.borderRadius = "999px";
+  closeBtn.style.padding = "0.35rem 0.9rem";
+  closeBtn.style.background = "transparent";
+  closeBtn.style.color = "inherit";
+  closeBtn.style.cursor = "pointer";
+  closeBtn.onclick = () => {
+    el?.remove();
+  };
+  el.append(msg, closeBtn);
+  doc.body.appendChild(el);
+  return el;
+}
+function showBannerMessage(doc, message, id = DEFAULT_BANNER_ID) {
+  const banner = ensureBanner(doc, id);
+  const msg = banner.querySelector(`#${id}-message`);
+  if (msg) msg.textContent = message;
+}
+function installGlobalErrorHandler(options = {}) {
+  if (typeof window === "undefined") {
+    return () => {
+    };
+  }
+  const doc = resolveDocument(options.root);
+  const showBanner = options.showBanner ?? true;
+  const getMessage = options.getMessage ?? ((_error, _source) => "Something went wrong. Please check the console for details.");
+  const onError = (event) => {
+    console.error("[dbf-core] Uncaught error:", event.error ?? event.message);
+    if (doc && showBanner) {
+      showBannerMessage(doc, getMessage(event.error ?? event.message, "error"));
+    }
+  };
+  const onUnhandledRejection = (event) => {
+    console.error("[dbf-core] Unhandled promise rejection:", event.reason);
+    if (doc && showBanner) {
+      showBannerMessage(
+        doc,
+        getMessage(event.reason, "unhandledrejection")
+      );
+    }
+  };
+  window.addEventListener("error", onError);
+  window.addEventListener("unhandledrejection", onUnhandledRejection);
+  return () => {
+    window.removeEventListener("error", onError);
+    window.removeEventListener("unhandledrejection", onUnhandledRejection);
+  };
+}
 export {
   DBFComponent,
   define,
   defineComponent,
   defineProps,
   html,
+  installGlobalErrorHandler,
   on,
   parseProp,
   render

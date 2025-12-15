@@ -5,6 +5,7 @@ const statProps = defineProps({
   label: "string",
   value: "string",
   hint: "string",
+  imageUrl: "string",
 } as const);
 
 type StatProps = PropsFromSchema<typeof statProps>;

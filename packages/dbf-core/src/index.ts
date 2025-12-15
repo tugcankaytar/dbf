@@ -5,6 +5,11 @@ export { html } from "./dom/html";
 export { render } from "./dom/render";
 export { on } from "./events/on";
 export {
+  installGlobalErrorHandler,
+  type GlobalErrorHandlerOptions,
+  type GlobalErrorSource,
+} from "./errors/global";
+export {
   parseProp,
   defineProps,
   type PropSchema,

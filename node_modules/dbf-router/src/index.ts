@@ -33,7 +33,7 @@ export interface LinkHandlerOptions {
   root?: Document | HTMLElement;
   /**
    * Route link'lerini seçmek için CSS selector.
-   * Varsayılan: '[data-nav-route]'
+   * Varsayılan: 'a[href]'
    */
   selector?: string;
 }
@@ -73,8 +73,9 @@ export function createRouter(options: RouterOptions): Router {
       const target = basePath + path;
       if (window.location.pathname !== target) {
         window.history.pushState({}, "", target);
-        handleLocation();
       }
+      // Aynı path'e gitsek bile view'ı yeniden çalıştır (örn: dil değişimi)
+      handleLocation();
     },
     start() {
       if (listening) return;
@@ -102,7 +103,7 @@ export function enableLinkNavigation(
   options: LinkHandlerOptions = {}
 ): () => void {
   const root = options.root ?? document;
-  const selector = options.selector ?? "[data-nav-route]";
+  const selector = options.selector ?? "a[href]";
 
   const onClick = (ev: Event) => {
     if (!(ev instanceof MouseEvent)) return;
@@ -111,10 +112,26 @@ export function enableLinkNavigation(
       return;
     }
 
-    const target = ev.target as HTMLElement | null;
-    const link = target?.closest<HTMLElement>(selector);
+    const rawTarget = ev.target as HTMLElement | null;
+
+    let link: HTMLElement | null = null;
+
+    // Shadow DOM içindeki link'leri de desteklemek için composedPath kullan.
+    const eventPath = (ev.composedPath && ev.composedPath()) || [];
+    for (const el of eventPath) {
+      if (el instanceof HTMLElement && el.matches(selector)) {
+        link = el;
+        break;
+      }
+    }
+
+    // composedPath desteklenmiyorsa, klasik closest fallback'ine dön.
+    if (!link && rawTarget) {
+      link = rawTarget.closest<HTMLElement>(selector);
+    }
     if (!link) return;
 
+    // data-nav-route varsa override olarak kullanılır, yoksa href source of truth'tur.
     const path = link.getAttribute("data-nav-route") ?? link.getAttribute("href");
     if (!path || path.startsWith("http")) return;
 

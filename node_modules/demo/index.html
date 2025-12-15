@@ -12,29 +12,12 @@
   <body>
     <div id="app" class="layout">
       <header class="site-header">
-        <div class="site-header-inner">
-          <div class="brand">
-            <span class="brand-mark">DBF</span>
-            <span class="brand-text">Core</span>
-          </div>
-          <nav class="nav">
-            <a href="/" data-nav-route="/">Overview</a>
-            <a href="/docs" data-nav-route="/docs">Docs</a>
-            <a href="/components" data-nav-route="/components">Components</a>
-          </nav>
-          <button class="btn small ghost">Star on GitHub</button>
-        </div>
+        <home-menu></home-menu>
       </header>
-
       <main class="landing">
         <!-- Router will inject page content here -->
       </main>
-
-      <footer class="site-footer">
-        <span>© ${new Date().getFullYear()} DBF Core</span>
-        <span class="dot">•</span>
-        <span>Built with native Web Components</span>
-      </footer>
+      <home-footer></home-footer>
     </div>
   </body>
 </html>

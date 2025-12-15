@@ -1,13 +1,13 @@
+import { getStrings } from "../middlewares/language";
+
 export function renderDocs(root: HTMLElement) {
+  const dict = getStrings().docs;
+
   root.innerHTML = `
     <section class="newsletter">
-      <h2>Docs (coming soon)</h2>
+      <h2>${dict.title}</h2>
       <p>
-        DBF Router provides a small, HTML-first API on top of the History API to let you
-        build multi-view apps with Web Components.
-      </p>
-      <p class="newsletter-meta">
-        This is a placeholder "docs" view to demonstrate client-side routing.
+        ${dict.body}
       </p>
     </section>
   `;

@@ -1,0 +1,60 @@
+{
+  "menu": {
+    "overview": "Overview",
+    "docs": "Docs",
+    "components": "Component examples",
+    "star": "Star on GitHub",
+    "switchToOther": "Türkçe"
+  },
+  "homeHero": {
+    "badge": "New • Developer Preview",
+    "title": "Build Web Components, Fast.",
+    "subtitle": "DBF Core is a tiny toolkit for writing modern Web Components with state, props and events.",
+    "primaryCta": "Get started",
+    "secondaryCta": "View docs",
+    "meta": "HTML-first. Framework-agnostic. Production ready."
+  },
+  "homeStats": {
+    "items": [
+      { "label": "Lightweight", "value": "< 5 KB", "hint": "minified, gzip, tree-shaken" },
+      { "label": "Native", "value": "0 deps", "hint": "Built on Web Components" },
+      { "label": "DX", "value": "Type-safe", "hint": "Tiny, modern API surface" }
+    ]
+  },
+  "homeNewsletter": {
+    "title": "Stay in the loop",
+    "body": "Get notified when we ship new features, examples and guides.",
+    "inputPlaceholder": "Enter your email",
+    "cta": "Join waitlist",
+    "meta": "No spam, unsubscribe anytime."
+  },
+  "homeFeatures": {
+    "cards": [
+      {
+        "title": "State & props",
+        "description": "Describe component behavior with a small, React-like API built for Web Components."
+      },
+      {
+        "title": "Shadow DOM friendly styles",
+        "description": "Attach styles per component via the styles option — no global leakage."
+      },
+      {
+        "title": "HTML-first composition",
+        "description": "Use custom tags directly in HTML — works with any framework or no framework."
+      }
+    ]
+  },
+  "footer": {
+    "builtWith": "Built with native Web Components"
+  },
+  "docs": {
+    "title": "Documentation",
+    "body": "DBF Core gives you a small, predictable API on top of the browser's native component model."
+  },
+  "componentsPage": {
+    "cardTitle": "dbf-card",
+    "cardDescription": "A minimal, flexible card component.",
+    "counterTitle": "Counter demo",
+    "counterDescription": "Local state and events in just a few lines of code."
+  }
+}

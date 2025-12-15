@@ -40,14 +40,24 @@ function createRouter(options) {
 }
 function enableLinkNavigation(router, options = {}) {
   const root = options.root ?? document;
-  const selector = options.selector ?? "[data-nav-route]";
+  const selector = options.selector ?? "a[href]";
   const onClick = (ev) => {
     if (!(ev instanceof MouseEvent)) return;
     if (ev.defaultPrevented || ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) {
       return;
     }
-    const target = ev.target;
-    const link = target?.closest(selector);
+    const rawTarget = ev.target;
+    let link = null;
+    const eventPath = ev.composedPath && ev.composedPath() || [];
+    for (const el of eventPath) {
+      if (el instanceof HTMLElement && el.matches(selector)) {
+        link = el;
+        break;
+      }
+    }
+    if (!link && rawTarget) {
+      link = rawTarget.closest(selector);
+    }
     if (!link) return;
     const path = link.getAttribute("data-nav-route") ?? link.getAttribute("href");
     if (!path || path.startsWith("http")) return;

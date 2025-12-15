@@ -28,7 +28,7 @@ interface LinkHandlerOptions {
     root?: Document | HTMLElement;
     /**
      * Route link'lerini seçmek için CSS selector.
-     * Varsayılan: '[data-nav-route]'
+     * Varsayılan: 'a[href]'
      */
     selector?: string;
 }

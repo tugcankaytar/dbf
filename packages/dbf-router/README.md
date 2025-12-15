@@ -48,19 +48,25 @@ When the location changes (via `navigate` or the back/forward buttons), the corr
 
 `enableLinkNavigation(router, options?)` attaches a global click handler that:
 
-- Listens for clicks on elements matching `options.selector` (default: `[data-nav-route]`)
-- Reads the target path from `data-nav-route` (or `href` as a fallback)
+- Listens for clicks on elements matching `options.selector` (default: `a[href]`)
+- Reads the target path from `href` (or `data-nav-route` as an optional override)
 - Ignores:
   - Middle clicks
   - Modifier clicks (Ctrl/Cmd/Shift/Alt)
   - External links (`http://`, `https://`)
 - Calls `router.navigate(path)` and prevents the browser’s default navigation
 
-Example HTML:
+Recommended HTML (no duplication):
 
 ```html
-<a href="/docs" data-nav-route="/docs">Docs</a>
-<a href="/components" data-nav-route="/components">Components</a>
+<a href="/docs">Docs</a>
+<a href="/components">Components</a>
+```
+
+If you really need to override the SPA route while keeping a different `href`, you can still use `data-nav-route`:
+
+```html
+<a href="/marketing" data-nav-route="/docs">Docs</a>
 ```
 
 You can scope the handler to a specific container:

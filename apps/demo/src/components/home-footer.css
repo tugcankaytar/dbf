@@ -1,0 +1,14 @@
+.site-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(148, 163, 184, 0.25);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: #9ca3af;
+  }
+  .site-footer .dot {
+    opacity: 0.5;
+  }
+  

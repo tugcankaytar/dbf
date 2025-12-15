@@ -1,0 +1,62 @@
+{
+  "menu": {
+    "overview": "Genel Bakış",
+    "docs": "Dökümantasyon",
+    "components": "Bileşen örnekleri",
+    "star": "GitHub'da yıldız ver",
+    "switchToOther": "English"
+  },
+  "homeHero": {
+    "badge": "Yeni • Geliştirici Önizlemesi",
+    "title": "Web Component’leri hızlıca oluştur.",
+    "subtitle": "DBF Core, state, props ve event’lerle modern Web Component’ler yazmanı sağlayan küçük bir araç setidir.",
+    "primaryCta": "Başlarken",
+    "secondaryCta": "Dökümantasyonu aç",
+    "meta": "HTML-öncelikli. Framework bağımsız. Üretim için hazır."
+  },
+  "homeStats": {
+    "items": [
+      { "label": "Hafif", "value": "< 5 KB", "hint": "minified, gzip, tree-shaken" },
+      { "label": "Yerel", "value": "0 bağımlılık", "hint": "Web Components üzerine kurulu" },
+      { "label": "Geliştirici deneyimi", "value": "Tip güvenli", "hint": "Küçük ve modern API yüzeyi" }
+    ]
+  },
+  "homeNewsletter": {
+    "title": "Güncel kal",
+    "body": "Yeni özellikler, örnekler ve rehberler çıktığında haberdar olun.",
+    "inputPlaceholder": "E-posta adresinizi girin",
+    "cta": "Bekleme listesine katıl",
+    "meta": "Spam yok, istediğiniz zaman ayrılabilirsiniz."
+  },
+  "homeFeatures": {
+    "cards": [
+      {
+        "title": "State ve props",
+        "description": "Bileşen davranışını, Web Components için tasarlanmış küçük ve React-benzeri bir API ile tanımlayın."
+      },
+      {
+        "title": "Shadow DOM dostu stiller",
+        "description": "Her bileşene özel stilleri styles opsiyonu ile ekleyin — global CSS kirlenmesi olmadan."
+      },
+      {
+        "title": "HTML-öncelikli bileşim",
+        "description": "Özel tag'leri doğrudan HTML içinde kullanın — herhangi bir framework ile veya frameworksüz çalışır."
+      }
+    ]
+  },
+  "footer": {
+    "builtWith": "Native Web Components ile geliştirildi"
+  },
+  "docs": {
+    "title": "Dökümantasyon",
+    "body": "DBF Core, tarayıcının yerel bileşen modelinin üzerinde küçük ve tahmin edilebilir bir API sunar."
+  },
+  "componentsPage": {
+    "cardTitle": "dbf-card",
+    "cardDescription": "Minimal ve esnek bir kart bileşeni.",
+    "counterTitle": "Sayaç demosu",
+    "counterDescription": "Birkaç satır kodla lokal state ve event örneği."
+  }
+}
+
+

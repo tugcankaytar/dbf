@@ -132,4 +132,33 @@ declare function defineComponent<S extends StateObj = StateObj, P extends PropsO
 
 declare function render(root: ShadowRoot | HTMLElement, tpl: string): void;
 
-export { DBFComponent, type PropSchema, type PropType, type PropsFromSchema, define, defineComponent, defineProps, html, on, parseProp, render };
+type GlobalErrorSource = "error" | "unhandledrejection";
+interface GlobalErrorHandlerOptions {
+    /**
+     * Whether to show a small banner at the bottom of the page when a global
+     * error occurs. Defaults to `true` in browser environments.
+     */
+    showBanner?: boolean;
+    /**
+     * Document or root element used to attach the banner.
+     * Defaults to `document`.
+     */
+    root?: Document | HTMLElement;
+    /**
+     * Build the message shown in the banner.
+     * By default a generic “something went wrong” message is used.
+     */
+    getMessage?(error: unknown, source: GlobalErrorSource): string;
+}
+/**
+ * Installs global `error` and `unhandledrejection` handlers.
+ *
+ * This is an **optional helper** — libraries should not call it automatically.
+ * Call it from your application entry point if you want a simple global error
+ * banner + console logging.
+ *
+ * Returns a cleanup function that removes the installed handlers.
+ */
+declare function installGlobalErrorHandler(options?: GlobalErrorHandlerOptions): () => void;
+
+export { DBFComponent, type GlobalErrorHandlerOptions, type GlobalErrorSource, type PropSchema, type PropType, type PropsFromSchema, define, defineComponent, defineProps, html, installGlobalErrorHandler, on, parseProp, render };

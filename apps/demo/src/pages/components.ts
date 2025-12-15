@@ -1,9 +1,13 @@
+import { getStrings } from "../middlewares/language";
+
 export function renderComponents(root: HTMLElement) {
+  const dict = getStrings().componentsPage;
+
   root.innerHTML = `
     <section class="hero-preview" id="components">
       <dbf-card
-        title="dbf-card"
-        description="A simple card component composed with DBF Core."
+        title="${dict.cardTitle}"
+        description="${dict.cardDescription}"
         imageUrl="https://vitejs.dev/logo.svg"
       >
         <dbf-input placeholder="Title" type="text"></dbf-input>
@@ -11,8 +15,8 @@ export function renderComponents(root: HTMLElement) {
       </dbf-card>
 
       <dbf-card
-        title="Counter demo"
-        description="State and events without a virtual DOM."
+        title="${dict.counterTitle}"
+        description="${dict.counterDescription}"
         imageUrl="https://vitejs.dev/logo.svg"
       >
         <dbf-counter></dbf-counter>
