@@ -11,6 +11,9 @@ function parseProp(type, raw) {
   if (type === "json") return JSON.parse(raw);
   return raw;
 }
+function defineProps(schema) {
+  return schema;
+}
 
 // src/component/Component.ts
 var DBFComponent = class extends HTMLElement {
@@ -164,6 +167,7 @@ function on(root, eventName, selector, handler) {
 
 // src/component/defineComponent.ts
 function defineComponent(tag, options) {
+  const stylesPrefix = options.styles == null ? "" : Array.isArray(options.styles) ? options.styles.join("\n") : options.styles;
   class Impl extends DBFComponent {
     static props = options.props;
     state = options.state ? options.state() : {};
@@ -178,12 +182,13 @@ function defineComponent(tag, options) {
       });
     }
     render() {
-      const tpl = options.render({
+      const body = options.render({
         state: this.state,
         props: this.props,
         html,
         host: this
       });
+      const tpl = stylesPrefix && !body.includes("<style") ? `<style>${stylesPrefix}</style>${body}` : stylesPrefix ? `<style>${stylesPrefix}</style>${body}` : body;
       render(this.root, tpl);
     }
   }
@@ -193,6 +198,7 @@ export {
   DBFComponent,
   define,
   defineComponent,
+  defineProps,
   html,
   on,
   parseProp,

@@ -1,6 +1,27 @@
 type PropType = "string" | "number" | "boolean" | "json";
 type PropSchema = Record<string, PropType>;
 declare function parseProp(type: PropType, raw: string | null): any;
+type PropValueFromType<T extends PropType> = T extends "string" ? string : T extends "number" ? number : T extends "boolean" ? boolean : any;
+/**
+ * Verilen prop şemasından TypeScript tipi üretir.
+ *
+ * const schema = { label: "string", count: "number" } as const;
+ * type Props = PropsFromSchema<typeof schema>;
+ */
+type PropsFromSchema<S extends PropSchema> = {
+    [K in keyof S]: PropValueFromType<S[K]>;
+};
+/**
+ * Props şemasını tek yerde tanımlayıp hem runtime hem de type-safe kullanmak için helper.
+ *
+ * const props = defineProps({
+ *   label: "string",
+ *   count: "number",
+ * } as const);
+ *
+ * type Props = PropsFromSchema<typeof props>;
+ */
+declare function defineProps<S extends PropSchema>(schema: S): S;
 
 /**
  * React benzeri bir temel component sınıfı.
@@ -86,6 +107,11 @@ interface DefineComponentOptions<S extends StateObj = StateObj, P extends PropsO
     props?: PropSchema;
     /** Başlangıç state'i */
     state?: () => S;
+    /**
+     * Shadow root'a her render'da en başta eklenecek sabit stil(ler).
+     * Örn: import styles from "./my-comp.css?inline"; styles: styles
+     */
+    styles?: string | string[];
     /** Her render'da çalışacak template fonksiyonu */
     render(ctx: ComponentRenderCtx<S, P>): string;
     /** İlk mount'ta (event bağlama vs) çalışacak opsiyonel hook */
@@ -106,4 +132,4 @@ declare function defineComponent<S extends StateObj = StateObj, P extends PropsO
 
 declare function render(root: ShadowRoot | HTMLElement, tpl: string): void;
 
-export { DBFComponent, type PropSchema, type PropType, define, defineComponent, html, on, parseProp, render };
+export { DBFComponent, type PropSchema, type PropType, type PropsFromSchema, define, defineComponent, defineProps, html, on, parseProp, render };

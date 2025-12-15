@@ -4,4 +4,11 @@ export { defineComponent } from "./component/defineComponent";
 export { html } from "./dom/html";
 export { render } from "./dom/render";
 export { on } from "./events/on";
-export { parseProp, type PropSchema, type PropType } from "./component/props";
+export {
+  parseProp,
+  defineProps,
+  type PropSchema,
+  type PropType,
+  type PropsFromSchema,
+} from "./component/props";
+

@@ -32,6 +32,11 @@ export interface DefineComponentOptions<
   props?: PropSchema;
   /** Başlangıç state'i */
   state?: () => S;
+  /**
+   * Shadow root'a her render'da en başta eklenecek sabit stil(ler).
+   * Örn: import styles from "./my-comp.css?inline"; styles: styles
+   */
+  styles?: string | string[];
   /** Her render'da çalışacak template fonksiyonu */
   render(ctx: ComponentRenderCtx<S, P>): string;
   /** İlk mount'ta (event bağlama vs) çalışacak opsiyonel hook */
@@ -53,6 +58,13 @@ export function defineComponent<
   S extends StateObj = StateObj,
   P extends PropsObj = PropsObj
 >(tag: string, options: DefineComponentOptions<S, P>): void {
+  const stylesPrefix =
+    options.styles == null
+      ? ""
+      : Array.isArray(options.styles)
+      ? options.styles.join("\n")
+      : options.styles;
+
   class Impl extends DBFComponent<S, P> {
     static props: PropSchema | undefined = options.props;
 
@@ -70,12 +82,20 @@ export function defineComponent<
     }
 
     render(): void {
-      const tpl = options.render({
+      const body = options.render({
         state: this.state,
         props: this.props,
         html,
         host: this,
       });
+
+      const tpl =
+        stylesPrefix && !body.includes("<style")
+          ? `<style>${stylesPrefix}</style>${body}`
+          : stylesPrefix
+          ? `<style>${stylesPrefix}</style>${body}`
+          : body;
+
       render(this.root, tpl);
     }
   }

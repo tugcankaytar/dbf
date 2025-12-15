@@ -1,0 +1,35 @@
+:host {
+  display: block;
+  font: 14px system-ui;
+}
+
+.stat {
+  padding: 1.1rem 1.2rem;
+  border-radius: 1rem;
+  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 55%),
+    rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+.stat-hint {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+

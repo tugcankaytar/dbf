@@ -1,22 +1,18 @@
-import { defineComponent } from "dbf-core";
+import { defineComponent, defineProps, type PropsFromSchema } from "dbf-core";
+import inputStyles from "./dbf-input.css?inline";
 
-interface InputState {
-  value: string;
-}
+const inputProps = defineProps({
+  placeholder: "string",
+  type: "string",
+} as const);
 
-interface InputProps {
-  placeholder: string;
-}
+type InputProps = PropsFromSchema<typeof inputProps>;
 
-defineComponent<InputState, InputProps>("dbf-input", {
+defineComponent<never, InputProps>("dbf-input", {
   // <dbf-input placeholder="Adınızı girin"> gibi kullanımı destekler
-  props: { placeholder: "string" },
+  props: inputProps,
 
-  state: () => ({
-    value: "",
-  }),
-
-  mount({ root, on, setState, host }) {
+  /*mount({ root, on, setState, host }) {
     // Shadow root içindeki <input> için input event'ini dinle
     on(root, "input", "input", (_ev, el) => {
       const input = el as HTMLInputElement;
@@ -32,38 +28,16 @@ defineComponent<InputState, InputProps>("dbf-input", {
         })
       );
     });
-  },
+  },*/
 
-  render({ state, props, html }) {
+  styles: inputStyles,
+
+  render({ props, html }) {
     const placeholder = props.placeholder ?? "Type something...";
 
     return html`
-      <style>
-        :host {
-          display: block;
-          font: 14px system-ui;
-          padding: 12px;
-        }
-        label {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-        }
-        input {
-          padding: 8px 10px;
-          border-radius: 8px;
-          border: 1px solid #ccc;
-          font: inherit;
-        }
-        .value {
-          color: #555;
-          font-size: 12px;
-        }
-      </style>
-
       <label>
-        <span class="value">Current value: ${state.value || "—"}</span>
-        <input type="text" placeholder="${placeholder}" value="${state.value}" />
+        <input type="${props.type ?? "text"}" placeholder="${placeholder}" />
       </label>
     `;
   },

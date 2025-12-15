@@ -4,10 +4,118 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>demo</title>
+    <title>DBF Core Demo</title>
+    <script type="module">
+      import "/src/components";
+    </script>
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <div id="app" class="layout">
+      <header class="site-header">
+        <div class="site-header-inner">
+          <div class="brand">
+            <span class="brand-mark">DBF</span>
+            <span class="brand-text">Core</span>
+          </div>
+          <nav class="nav">
+            <a href="#why">Why DBF Core?</a>
+            <a href="#how-it-works">How it works</a>
+            <a href="#components">Components</a>
+          </nav>
+          <button class="btn small ghost">Star on GitHub</button>
+        </div>
+      </header>
+
+      <main class="landing">
+        <section class="hero" id="top">
+          <p class="badge">Web Components • Developer Toolkit</p>
+          <h1>Ship UI with native Web Components.</h1>
+          <p class="hero-subtitle">
+            DBF Core is a tiny layer on top of Custom Elements that gives you state, props,
+            events and rendering — without committing to a heavy framework.
+          </p>
+          <div class="hero-actions">
+            <button class="btn primary">Get started</button>
+            <button class="btn ghost">Open docs</button>
+          </div>
+          <p class="hero-meta">HTML-first. Framework-agnostic. Production ready foundations.</p>
+        </section>
+
+        <section class="hero-preview" id="components">
+          <dbf-card
+            title="dbf-card"
+            description="A simple card component composed with DBF Core."
+            imageUrl="https://vitejs.dev/logo.svg"
+          >
+            <dbf-input placeholder="Title" type="text"></dbf-input>
+            <dbf-input placeholder="Description" type="text"></dbf-input>
+          </dbf-card>
+
+          <dbf-card
+            title="Counter demo"
+            description="State and events without a virtual DOM."
+            imageUrl="https://vitejs.dev/logo.svg"
+          >
+            <dbf-counter></dbf-counter>
+          </dbf-card>
+        </section>
+
+        <section class="stats" id="why">
+          <div class="stats-grid">
+            <dbf-stat
+              label="Lightweight"
+              value="< 5 KB"
+              hint="Core runtime, minified & gzip"
+            ></dbf-stat>
+            <dbf-stat
+              label="Native"
+              value="0 abstractions"
+              hint="Built on top of Custom Elements"
+            ></dbf-stat>
+            <dbf-stat
+              label="DX"
+              value="Type-safe"
+              hint="Typed props, state helpers, events"
+            ></dbf-stat>
+          </div>
+        </section>
+
+        <section class="features" id="how-it-works">
+          <div class="features-grid">
+            <dbf-card
+              title="State & props"
+              description="Describe component behavior with a small, React-like API built for Web Components."
+              imageUrl="https://vitejs.dev/logo.svg"
+            ></dbf-card>
+            <dbf-card
+              title="Shadow DOM friendly styles"
+              description="Attach styles per component via the styles option — no global leakage."
+              imageUrl="https://vitejs.dev/logo.svg"
+            ></dbf-card>
+            <dbf-card
+              title="HTML-first composition"
+              description="Use custom tags directly in HTML — works with any framework or no framework."
+              imageUrl="https://vitejs.dev/logo.svg"
+            ></dbf-card>
+          </div>
+        </section>
+
+        <section class="newsletter">
+          <h2>Stay in the loop</h2>
+          <p>Get early access to docs, examples and production-ready starters.</p>
+          <div class="newsletter-form">
+            <dbf-input placeholder="Email adresinizi girin" type="text"></dbf-input>
+            <button class="btn primary">Join waitlist</button>
+          </div>
+          <p class="newsletter-meta">No spam, only product updates and learning resources.</p>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <span>© ${new Date().getFullYear()} DBF Core</span>
+        <span class="dot">•</span>
+        <span>Built with native Web Components</span>
+      </footer>
+    </div>
   </body>
 </html>
