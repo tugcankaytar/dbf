@@ -1,0 +1,8 @@
+{
+  "name": "dbf-monorepo",
+  "private": true,
+  "scripts": {
+    "build:core": "cd packages/dbf-core && npm run build",
+    "dev:core": "cd packages/dbf-core && npm run dev"
+  }
+}
