@@ -22,8 +22,8 @@ function createRouter(options) {
       const target = basePath + path;
       if (window.location.pathname !== target) {
         window.history.pushState({}, "", target);
-        handleLocation();
       }
+      handleLocation();
     },
     start() {
       if (listening) return;
