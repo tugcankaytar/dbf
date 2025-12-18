@@ -41,8 +41,18 @@ defineComponent<HomeMenuState>("home-menu", {
       <div class="site-header-inner">
         <div class="brand">
           <span class="brand-mark">DBF</span>
-          <span class="brand-text">Core</span>
-        </div>
+          <span class="brand-text-wrapper">
+            <span class="brand-text-list">
+              <span class="brand-text">Core</span>
+            </span>
+            <span class="brand-text-list">
+              <span class="brand-text">Router</span>
+            </span>
+            <span class="brand-text-list">
+              <span class="brand-text">UI</span>
+            </span>
+          </span>
+        </div>  
         <nav class="nav">
           <a href="/">${menu.overview}</a>
           <a href="/docs">${menu.docs}</a>

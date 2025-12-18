@@ -46,6 +46,44 @@
   font-size: 0.9rem;
 }
 
+.brand-text-wrapper {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  height: 1.2rem;
+}
+
+.brand-text-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  animation: brand-cycle 5s infinite ease-in-out;
+}
+
+@keyframes brand-cycle {
+  0% {
+    transform: translateY(0%);
+  }
+  25% {
+    transform: translateY(0%);
+  }
+  35% {
+    transform: translateY(-100%);
+  }
+  60% {
+    transform: translateY(-100%);
+  }
+  70% {
+    transform: translateY(-200%);
+  }
+  95% {
+    transform: translateY(-200%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
 .nav {
   display: flex;
   gap: 1rem;
