@@ -2,8 +2,7 @@ import { createRouter, enableLinkNavigation } from "dbf-router";
 import { renderHome } from "../pages/home";
 import { renderDocs } from "../pages/docs";
 import { renderComponents } from "../pages/components";
-import { installGlobalErrorHandler } from "dbf-core";
-import { onLanguageChange } from "../middlewares/language";
+import { installGlobalErrorHandler, onLanguageChange } from "dbf-core";
 
 // Install a simple global error banner + console logging
 installGlobalErrorHandler(

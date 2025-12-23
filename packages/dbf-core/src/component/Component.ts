@@ -1,6 +1,7 @@
 import { schedule } from "../internal/scheduler";
 import type { PropSchema } from "./props";
 import { parseProp } from "./props";
+import { startRender, endRender, cleanupHooks } from "../hooks/dispatcher";
 
 /**
  * React benzeri bir temel component sınıfı.
@@ -116,7 +117,17 @@ export abstract class DBFComponent<
       const isFirst = this._isFirstRender;
       this._isFirstRender = false;
 
-      this.render();
+      // Hooks render başlangıcı
+      startRender(this);
+      (globalThis as any).__DBF_CURRENT_COMPONENT__ = this;
+
+      try {
+        this.render();
+      } finally {
+        // Hooks render bitişi (effect'leri çalıştır)
+        endRender(this);
+        (globalThis as any).__DBF_CURRENT_COMPONENT__ = undefined;
+      }
 
       if (!this._isMounted) return;
 
@@ -136,6 +147,8 @@ export abstract class DBFComponent<
   disconnectedCallback() {
     this._isMounted = false;
     this.componentWillUnmount();
+    // Hooks cleanup
+    cleanupHooks(this);
   }
 
   /** Lifecycle hook'ları. Kullanıcı isterse override eder. */

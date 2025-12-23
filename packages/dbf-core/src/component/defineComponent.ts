@@ -4,6 +4,7 @@ import { define } from "./define";
 import { html } from "../dom/html";
 import { render } from "../dom/render";
 import { on } from "../events/on";
+import { startRender, endRender } from "../hooks/dispatcher";
 
 type StateObj = Record<string, any>;
 type PropsObj = Record<string, any>;
@@ -82,21 +83,31 @@ export function defineComponent<
     }
 
     render(): void {
-      const body = options.render({
-        state: this.state,
-        props: this.props,
-        html,
-        host: this,
-      });
+      // Hooks render başlangıcı
+      startRender(this);
+      (globalThis as any).__DBF_CURRENT_COMPONENT__ = this;
 
-      const tpl =
-        stylesPrefix && !body.includes("<style")
-          ? `<style>${stylesPrefix}</style>${body}`
-          : stylesPrefix
-          ? `<style>${stylesPrefix}</style>${body}`
-          : body;
+      try {
+        const body = options.render({
+          state: this.state,
+          props: this.props,
+          html,
+          host: this,
+        });
 
-      render(this.root, tpl);
+        const tpl =
+          stylesPrefix && !body.includes("<style")
+            ? `<style>${stylesPrefix}</style>${body}`
+            : stylesPrefix
+            ? `<style>${stylesPrefix}</style>${body}`
+            : body;
+
+        render(this.root, tpl);
+      } finally {
+        // Hooks render bitişi (effect'leri çalıştır)
+        endRender(this);
+        (globalThis as any).__DBF_CURRENT_COMPONENT__ = undefined;
+      }
     }
   }
 

@@ -1,7 +1,6 @@
-import { defineComponent } from "dbf-core";
+import { defineComponent, getStrings } from "dbf-core";
 import styles from "./home-stats.css?inline";
 import imageUrl from "../../public/vite.svg";
-import { getStrings } from "../middlewares/language";
 
 defineComponent("home-stats", {
   styles,

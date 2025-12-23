@@ -6,10 +6,13 @@
  * - Developer dostu API: küçük bir createRouter + navigate fonksiyonları
  * - Framework bağımsız: sadece History API ve DOM kullanır
  */
-type RouteHandler = (params: Record<string, string>) => void;
+type RouteHandler = (params: Record<string, string>, query: Record<string, string>, hash: string) => void;
 interface RouteConfig {
     path: string;
     onEnter: RouteHandler;
+    beforeEnter?: (params: Record<string, string>, query: Record<string, string>, hash: string) => boolean | string | void;
+    children?: RouteConfig[];
+    layout?: (root: HTMLElement, outlet: HTMLElement) => void;
 }
 interface RouterOptions {
     basePath?: string;

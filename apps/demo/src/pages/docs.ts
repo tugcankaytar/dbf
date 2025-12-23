@@ -1,4 +1,4 @@
-import { getStrings } from "../middlewares/language";
+import { getStrings } from "dbf-core";
 
 export function renderDocs(root: HTMLElement) {
   const dict = getStrings().docs;

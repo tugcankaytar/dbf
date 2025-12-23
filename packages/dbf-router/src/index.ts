@@ -7,11 +7,22 @@
  * - Framework bağımsız: sadece History API ve DOM kullanır
  */
 
-export type RouteHandler = (params: Record<string, string>) => void;
+export type RouteHandler = (
+  params: Record<string, string>,
+  query: Record<string, string>,
+  hash: string
+) => void;
 
 export interface RouteConfig {
   path: string;
   onEnter: RouteHandler;
+  beforeEnter?: (
+    params: Record<string, string>,
+    query: Record<string, string>,
+    hash: string
+  ) => boolean | string | void; // true/void = continue, false = block, string = redirect
+  children?: RouteConfig[]; // Nested routes
+  layout?: (root: HTMLElement, outlet: HTMLElement) => void; // Layout render function
 }
 
 export interface RouterOptions {
@@ -38,18 +49,115 @@ export interface LinkHandlerOptions {
   selector?: string;
 }
 
+function parseQuery(search: string): Record<string, string> {
+  const params: Record<string, string> = {};
+  if (!search || !search.startsWith("?")) return params;
+  const pairs = search.slice(1).split("&");
+  for (const pair of pairs) {
+    const [key, value] = pair.split("=");
+    if (key) {
+      params[decodeURIComponent(key)] = value ? decodeURIComponent(value) : "";
+    }
+  }
+  return params;
+}
+
 function matchRoute(
   pathname: string,
   routes: RouteConfig[],
-  basePath: string
-): { route: RouteConfig; params: Record<string, string> } | null {
+  basePath: string,
+  parentPath: string = ""
+): {
+  route: RouteConfig;
+  params: Record<string, string>;
+  query: Record<string, string>;
+  hash: string;
+  matchedPath: string;
+  remainingPath: string;
+} | null {
   const normalized = pathname.startsWith(basePath)
     ? pathname.slice(basePath.length) || "/"
     : pathname || "/";
 
+  const [pathOnly, hashPart] = normalized.split("#");
+  const hash = hashPart ? `#${hashPart}` : "";
+
+  const [pathWithoutQuery, queryString] = pathOnly.split("?");
+  const query = parseQuery(queryString ? `?${queryString}` : "");
+
+  // Parent path'i çıkar
+  const relativePath = parentPath
+    ? pathWithoutQuery.startsWith(parentPath)
+      ? pathWithoutQuery.slice(parentPath.length) || "/"
+      : pathWithoutQuery
+    : pathWithoutQuery;
+
   for (const route of routes) {
-    if (route.path === normalized) {
-      return { route, params: {} };
+    const routeParams: Record<string, string> = {};
+    const routePattern = route.path.startsWith("/") ? route.path : `/${route.path}`;
+    const fullRoutePath = parentPath + routePattern;
+
+    // Parametreli route pattern'ini parse et (örn: /users/:id)
+    const routeParts = routePattern.split("/").filter(Boolean);
+    const pathParts = relativePath.split("/").filter(Boolean);
+
+    if (routeParts.length !== pathParts.length) {
+      // Wildcard route kontrolü: /posts/* gibi
+      if (routePattern.endsWith("/*")) {
+        const basePattern = routePattern.slice(0, -2);
+        if (relativePath.startsWith(basePattern)) {
+          return {
+            route,
+            params: routeParams,
+            query,
+            hash,
+            matchedPath: fullRoutePath,
+            remainingPath: "",
+          };
+        }
+      }
+      continue;
+    }
+
+    let matches = true;
+    for (let i = 0; i < routeParts.length; i++) {
+      const routePart = routeParts[i];
+      const pathPart = pathParts[i] || "";
+
+      if (routePart.startsWith(":")) {
+        // Parametre: :id -> { id: "123" }
+        const paramName = routePart.slice(1);
+        routeParams[paramName] = decodeURIComponent(pathPart);
+      } else if (routePart === "*") {
+        // Wildcard: kalan tüm path'i yakala
+        routeParams["*"] = pathParts.slice(i).join("/");
+        break;
+      } else if (routePart !== pathPart) {
+        // Literal eşleşme yok
+        matches = false;
+        break;
+      }
+    }
+
+    if (matches) {
+      const matchedPath = fullRoutePath;
+      const remainingPath = "/" + pathParts.slice(routeParts.length).join("/");
+
+      // Nested routes kontrolü
+      if (route.children && route.children.length > 0 && remainingPath !== "/") {
+        const nestedMatch = matchRoute(
+          pathname,
+          route.children,
+          basePath,
+          matchedPath
+        );
+        if (nestedMatch) {
+          // Nested route bulundu, onu döndür
+          return nestedMatch;
+        }
+      }
+
+      return { route, params: routeParams, query, hash, matchedPath, remainingPath };
     }
   }
 
@@ -60,18 +168,13 @@ export function createRouter(options: RouterOptions): Router {
   const basePath = options.basePath ?? "";
   let listening = false;
 
-  const handleLocation = () => {
-    const match = matchRoute(window.location.pathname, options.routes, basePath);
-    if (!match) return;
-    match.route.onEnter(match.params);
-  };
-
-  const onPopState = () => handleLocation();
-
-  return {
+  const router: Router = {
     navigate(path: string) {
-      const target = basePath + path;
-      if (window.location.pathname !== target) {
+      // Path'te query/hash varsa koru
+      const fullPath = path.startsWith("/") ? path : `/${path}`;
+      const target = basePath + fullPath;
+      const current = window.location.pathname + window.location.search + window.location.hash;
+      if (current !== target) {
         window.history.pushState({}, "", target);
       }
       // Aynı path'e gitsek bile view'ı yeniden çalıştır (örn: dil değişimi)
@@ -89,6 +192,46 @@ export function createRouter(options: RouterOptions): Router {
       window.removeEventListener("popstate", onPopState);
     },
   };
+
+  const handleLocation = () => {
+    const match = matchRoute(
+      window.location.pathname + window.location.search + window.location.hash,
+      options.routes,
+      basePath
+    );
+    if (!match) return;
+
+    // beforeEnter guard kontrolü
+    if (match.route.beforeEnter) {
+      const guardResult = match.route.beforeEnter(match.params, match.query, match.hash);
+      if (guardResult === false) {
+        // Navigasyon engellendi
+        return;
+      }
+      if (typeof guardResult === "string") {
+        // Redirect
+        router.navigate(guardResult);
+        return;
+      }
+    }
+
+    // Layout varsa önce layout'u render et, sonra route'u
+    if (match.route.layout) {
+      // Layout için root ve outlet element'leri oluştur
+      const layoutRoot = document.createElement("div");
+      const outlet = document.createElement("div");
+      outlet.setAttribute("data-router-outlet", "true");
+      match.route.layout(layoutRoot, outlet);
+      // onEnter'i outlet içinde çalıştır
+      match.route.onEnter(match.params, match.query, match.hash);
+    } else {
+      match.route.onEnter(match.params, match.query, match.hash);
+    }
+  };
+
+  const onPopState = () => handleLocation();
+
+  return router;
 }
 
 /**

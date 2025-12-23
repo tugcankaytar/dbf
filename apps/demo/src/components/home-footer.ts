@@ -1,6 +1,5 @@
-import { defineComponent } from "dbf-core";
+import { defineComponent, getStrings } from "dbf-core";
 import styles from "./home-footer.css?inline";
-import { getStrings } from "../middlewares/language";
 
 defineComponent("home-footer", {
   styles,

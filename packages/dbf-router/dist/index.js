@@ -1,9 +1,75 @@
 // src/index.ts
-function matchRoute(pathname, routes, basePath) {
+function parseQuery(search) {
+  const params = {};
+  if (!search || !search.startsWith("?")) return params;
+  const pairs = search.slice(1).split("&");
+  for (const pair of pairs) {
+    const [key, value] = pair.split("=");
+    if (key) {
+      params[decodeURIComponent(key)] = value ? decodeURIComponent(value) : "";
+    }
+  }
+  return params;
+}
+function matchRoute(pathname, routes, basePath, parentPath = "") {
   const normalized = pathname.startsWith(basePath) ? pathname.slice(basePath.length) || "/" : pathname || "/";
+  const [pathOnly, hashPart] = normalized.split("#");
+  const hash = hashPart ? `#${hashPart}` : "";
+  const [pathWithoutQuery, queryString] = pathOnly.split("?");
+  const query = parseQuery(queryString ? `?${queryString}` : "");
+  const relativePath = parentPath ? pathWithoutQuery.startsWith(parentPath) ? pathWithoutQuery.slice(parentPath.length) || "/" : pathWithoutQuery : pathWithoutQuery;
   for (const route of routes) {
-    if (route.path === normalized) {
-      return { route, params: {} };
+    const routeParams = {};
+    const routePattern = route.path.startsWith("/") ? route.path : `/${route.path}`;
+    const fullRoutePath = parentPath + routePattern;
+    const routeParts = routePattern.split("/").filter(Boolean);
+    const pathParts = relativePath.split("/").filter(Boolean);
+    if (routeParts.length !== pathParts.length) {
+      if (routePattern.endsWith("/*")) {
+        const basePattern = routePattern.slice(0, -2);
+        if (relativePath.startsWith(basePattern)) {
+          return {
+            route,
+            params: routeParams,
+            query,
+            hash,
+            matchedPath: fullRoutePath,
+            remainingPath: ""
+          };
+        }
+      }
+      continue;
+    }
+    let matches = true;
+    for (let i = 0; i < routeParts.length; i++) {
+      const routePart = routeParts[i];
+      const pathPart = pathParts[i] || "";
+      if (routePart.startsWith(":")) {
+        const paramName = routePart.slice(1);
+        routeParams[paramName] = decodeURIComponent(pathPart);
+      } else if (routePart === "*") {
+        routeParams["*"] = pathParts.slice(i).join("/");
+        break;
+      } else if (routePart !== pathPart) {
+        matches = false;
+        break;
+      }
+    }
+    if (matches) {
+      const matchedPath = fullRoutePath;
+      const remainingPath = "/" + pathParts.slice(routeParts.length).join("/");
+      if (route.children && route.children.length > 0 && remainingPath !== "/") {
+        const nestedMatch = matchRoute(
+          pathname,
+          route.children,
+          basePath,
+          matchedPath
+        );
+        if (nestedMatch) {
+          return nestedMatch;
+        }
+      }
+      return { route, params: routeParams, query, hash, matchedPath, remainingPath };
     }
   }
   return null;
@@ -11,16 +77,12 @@ function matchRoute(pathname, routes, basePath) {
 function createRouter(options) {
   const basePath = options.basePath ?? "";
   let listening = false;
-  const handleLocation = () => {
-    const match = matchRoute(window.location.pathname, options.routes, basePath);
-    if (!match) return;
-    match.route.onEnter(match.params);
-  };
-  const onPopState = () => handleLocation();
-  return {
+  const router = {
     navigate(path) {
-      const target = basePath + path;
-      if (window.location.pathname !== target) {
+      const fullPath = path.startsWith("/") ? path : `/${path}`;
+      const target = basePath + fullPath;
+      const current = window.location.pathname + window.location.search + window.location.hash;
+      if (current !== target) {
         window.history.pushState({}, "", target);
       }
       handleLocation();
@@ -37,6 +99,35 @@ function createRouter(options) {
       window.removeEventListener("popstate", onPopState);
     }
   };
+  const handleLocation = () => {
+    const match = matchRoute(
+      window.location.pathname + window.location.search + window.location.hash,
+      options.routes,
+      basePath
+    );
+    if (!match) return;
+    if (match.route.beforeEnter) {
+      const guardResult = match.route.beforeEnter(match.params, match.query, match.hash);
+      if (guardResult === false) {
+        return;
+      }
+      if (typeof guardResult === "string") {
+        router.navigate(guardResult);
+        return;
+      }
+    }
+    if (match.route.layout) {
+      const layoutRoot = document.createElement("div");
+      const outlet = document.createElement("div");
+      outlet.setAttribute("data-router-outlet", "true");
+      match.route.layout(layoutRoot, outlet);
+      match.route.onEnter(match.params, match.query, match.hash);
+    } else {
+      match.route.onEnter(match.params, match.query, match.hash);
+    }
+  };
+  const onPopState = () => handleLocation();
+  return router;
 }
 function enableLinkNavigation(router, options = {}) {
   const root = options.root ?? document;
