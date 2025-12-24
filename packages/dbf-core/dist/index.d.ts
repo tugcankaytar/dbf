@@ -321,7 +321,8 @@ type Context<T> = ReturnType<typeof createContext<T>>;
 declare function useContext<T>(context: Context<T>): T;
 /**
  * Context value'yu bir element'e bağla (Provider gibi)
+ * Update fonksiyonunu döndürür
  */
-declare function provideContext<T>(host: HTMLElement, context: Context<T>, value: T): void;
+declare function provideContext<T>(host: HTMLElement, context: Context<T>, value: T): (newValue: T) => void;
 
 export { type Context, DBFComponent, ErrorBoundaryComponent, type ErrorBoundaryProps, type ErrorBoundaryState, type GlobalErrorHandlerOptions, type GlobalErrorSource, type LanguageCode, type PropSchema, type PropType, type PropsFromSchema, type Reducer, createContext, createErrorBoundary, define, defineComponent, defineProps, getAvailableLanguages, getInputValue, getLanguage, getStrings, getStringsFor, html, i18n, installGlobalErrorHandler, isControlledInput, on, onLanguageChange, parseProp, provideContext, registerLanguage, render, setLanguage, syncFormInputs, updateControlledInput, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState };

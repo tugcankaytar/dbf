@@ -36,20 +36,25 @@ export function useEffect(effect: () => void | (() => void), deps?: any[]): void
   const hook = getCurrentHook<EffectHook>(component, () => createEffectHook(effect, deps, false));
 
   // Dependency değişti mi kontrol et
-  if (hook.deps !== undefined && deps !== undefined) {
-    if (shallowEqual(hook.deps, deps)) {
-      // Değişmedi, effect'i çalıştırma
-      return;
-    }
-  } else if (hook.deps === deps) {
-    // İkisi de undefined, değişmedi
-    return;
+  let shouldRun = false;
+  if (hook.deps === undefined && deps === undefined) {
+    // İlk render, çalıştır
+    shouldRun = true;
+  } else if (hook.deps === undefined || deps === undefined) {
+    // Biri undefined diğeri değil, değişti
+    shouldRun = true;
+  } else if (!shallowEqual(hook.deps, deps)) {
+    // Dependency değişti
+    shouldRun = true;
   }
 
-  // Dependency değişti veya ilk render, effect'i güncelle
-  hook.effect = effect;
-  hook.deps = deps;
-  // Effect render sonunda dispatcher tarafından çalıştırılacak
+  if (shouldRun) {
+    hook.effect = effect;
+    hook.deps = deps;
+    (hook as any)._shouldRun = true; // endRender'da çalıştırılacak
+  } else {
+    (hook as any)._shouldRun = false; // Çalıştırma
+  }
 }
 
 export function useLayoutEffect(effect: () => void | (() => void), deps?: any[]): void {
@@ -61,17 +66,21 @@ export function useLayoutEffect(effect: () => void | (() => void), deps?: any[])
   const hook = getCurrentHook<EffectHook>(component, () => createEffectHook(effect, deps, true));
 
   // Dependency kontrolü (useEffect ile aynı)
-  if (hook.deps !== undefined && deps !== undefined) {
-    if (shallowEqual(hook.deps, deps)) {
-      return;
-    }
-  } else if (hook.deps === deps) {
-    return;
+  let shouldRun = false;
+  if (hook.deps === undefined && deps === undefined) {
+    shouldRun = true;
+  } else if (hook.deps === undefined || deps === undefined) {
+    shouldRun = true;
+  } else if (!shallowEqual(hook.deps, deps)) {
+    shouldRun = true;
   }
 
-  hook.effect = effect;
-  hook.deps = deps;
-  // Layout effect'ler render'dan hemen sonra, paint'ten önce çalışmalı
-  // Şimdilik normal effect gibi çalıştırıyoruz, ileride optimize edilebilir
+  if (shouldRun) {
+    hook.effect = effect;
+    hook.deps = deps;
+    (hook as any)._shouldRun = true;
+  } else {
+    (hook as any)._shouldRun = false;
+  }
 }
 

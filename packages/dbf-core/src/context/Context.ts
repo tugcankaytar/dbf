@@ -47,8 +47,16 @@ export function useContext<T>(context: Context<T>): T {
         };
         contextValue.listeners.add(listener);
 
-        // Cleanup için useEffect benzeri kayıt
-        // (Bu hook index'i kullanmıyor, sadece cleanup için)
+        // Cleanup için component'in unmount callback'ine ekle
+        // Component unmount olduğunda listener'ı temizle
+        const originalUnmount = component.componentWillUnmount;
+        component.componentWillUnmount = function () {
+          contextValue.listeners.delete(listener);
+          if (originalUnmount) {
+            originalUnmount.call(this);
+          }
+        };
+
         return contextValue.value;
       }
     }
@@ -63,8 +71,13 @@ export function useContext<T>(context: Context<T>): T {
 
 /**
  * Context value'yu bir element'e bağla (Provider gibi)
+ * Update fonksiyonunu döndürür
  */
-export function provideContext<T>(host: HTMLElement, context: Context<T>, value: T): void {
+export function provideContext<T>(
+  host: HTMLElement,
+  context: Context<T>,
+  value: T
+): (newValue: T) => void {
   let store = contextStore.get(host);
   if (!store) {
     store = new Map();
@@ -86,7 +99,6 @@ export function provideContext<T>(host: HTMLElement, context: Context<T>, value:
     }
   };
 
-  // Update fonksiyonunu context value'ya ekle
-  (contextValue as any).update = updateValue;
+  return updateValue;
 }
 

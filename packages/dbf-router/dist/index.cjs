@@ -142,11 +142,15 @@ function createRouter(options) {
       }
     }
     if (match.route.layout) {
-      const layoutRoot = document.createElement("div");
+      const appRoot = document.querySelector("main") || document.body;
+      const layoutContainer = document.createElement("div");
+      layoutContainer.setAttribute("data-router-layout", "true");
       const outlet = document.createElement("div");
       outlet.setAttribute("data-router-outlet", "true");
-      match.route.layout(layoutRoot, outlet);
-      match.route.onEnter(match.params, match.query, match.hash);
+      match.route.layout(layoutContainer, outlet);
+      appRoot.innerHTML = "";
+      appRoot.appendChild(layoutContainer);
+      match.route.onEnter(match.params, match.query, match.hash, outlet);
     } else {
       match.route.onEnter(match.params, match.query, match.hash);
     }

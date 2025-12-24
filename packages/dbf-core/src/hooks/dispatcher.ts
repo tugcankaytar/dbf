@@ -34,30 +34,38 @@ export function startRender(component: any): void {
 }
 
 /**
- * Render bitişinde çağrılır: effect'leri çalıştır
+ * Render bitişinde çağrılır: sadece dependency değişen effect'leri çalıştır
  */
 export function endRender(component: any): void {
   const ctx = getHooksContext(component);
   ctx.isRendering = false;
 
-  // Effect hook'larını çalıştır (cleanup önce, sonra yeni effect)
+  // Effect hook'larını kontrol et - sadece dependency değişenleri çalıştır
+  // useEffect içinde zaten dependency check yapılıyor, burada sadece
+  // "çalıştırılması gereken" effect'leri çalıştırıyoruz
   for (const hook of ctx.hooks) {
     if (hook.type === "effect") {
-      // Cleanup önceki effect'ten varsa çalıştır
-      if (hook.cleanup) {
-        try {
-          hook.cleanup();
-        } catch (error) {
-          console.error("[dbf-core:hooks] Effect cleanup error:", error);
+      const effectHook = hook as any;
+      // useEffect içinde dependency değiştiyse effectHook._shouldRun flag'i set edilir
+      if (effectHook._shouldRun) {
+        // Cleanup önceki effect'ten varsa çalıştır
+        if (effectHook.cleanup) {
+          try {
+            effectHook.cleanup();
+          } catch (error) {
+            console.error("[dbf-core:hooks] Effect cleanup error:", error);
+          }
         }
-      }
 
-      // Yeni effect'i çalıştır
-      try {
-        const cleanup = hook.effect();
-        hook.cleanup = typeof cleanup === "function" ? cleanup : undefined;
-      } catch (error) {
-        console.error("[dbf-core:hooks] Effect error:", error);
+        // Yeni effect'i çalıştır
+        try {
+          const cleanup = effectHook.effect();
+          effectHook.cleanup = typeof cleanup === "function" ? cleanup : undefined;
+        } catch (error) {
+          console.error("[dbf-core:hooks] Effect error:", error);
+        }
+
+        effectHook._shouldRun = false;
       }
     }
   }

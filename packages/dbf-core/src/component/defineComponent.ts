@@ -83,31 +83,23 @@ export function defineComponent<
     }
 
     render(): void {
-      // Hooks render başlangıcı
-      startRender(this);
-      (globalThis as any).__DBF_CURRENT_COMPONENT__ = this;
+      // Not: startRender/endRender DBFComponent.invalidate() içinde zaten çağrılıyor
+      // Burada sadece template render ediyoruz
+      const body = options.render({
+        state: this.state,
+        props: this.props,
+        html,
+        host: this,
+      });
 
-      try {
-        const body = options.render({
-          state: this.state,
-          props: this.props,
-          html,
-          host: this,
-        });
+      const tpl =
+        stylesPrefix && !body.includes("<style")
+          ? `<style>${stylesPrefix}</style>${body}`
+          : stylesPrefix
+          ? `<style>${stylesPrefix}</style>${body}`
+          : body;
 
-        const tpl =
-          stylesPrefix && !body.includes("<style")
-            ? `<style>${stylesPrefix}</style>${body}`
-            : stylesPrefix
-            ? `<style>${stylesPrefix}</style>${body}`
-            : body;
-
-        render(this.root, tpl);
-      } finally {
-        // Hooks render bitişi (effect'leri çalıştır)
-        endRender(this);
-        (globalThis as any).__DBF_CURRENT_COMPONENT__ = undefined;
-      }
+      render(this.root, tpl);
     }
   }
 

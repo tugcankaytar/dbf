@@ -10,7 +10,8 @@
 export type RouteHandler = (
   params: Record<string, string>,
   query: Record<string, string>,
-  hash: string
+  hash: string,
+  outlet?: HTMLElement // Layout route'lar için outlet element
 ) => void;
 
 export interface RouteConfig {
@@ -217,13 +218,27 @@ export function createRouter(options: RouterOptions): Router {
 
     // Layout varsa önce layout'u render et, sonra route'u
     if (match.route.layout) {
-      // Layout için root ve outlet element'leri oluştur
-      const layoutRoot = document.createElement("div");
+      // Router'ın render edeceği root element'i bul (genellikle main veya #app)
+      // Bu, router'ın başlatıldığı yerde belirlenmeli, şimdilik document.body kullanıyoruz
+      const appRoot = document.querySelector("main") || document.body;
+      
+      // Layout container oluştur
+      const layoutContainer = document.createElement("div");
+      layoutContainer.setAttribute("data-router-layout", "true");
+      
+      // Outlet element oluştur (içerik buraya render edilecek)
       const outlet = document.createElement("div");
       outlet.setAttribute("data-router-outlet", "true");
-      match.route.layout(layoutRoot, outlet);
-      // onEnter'i outlet içinde çalıştır
-      match.route.onEnter(match.params, match.query, match.hash);
+      
+      // Layout'u render et
+      match.route.layout(layoutContainer, outlet);
+      
+      // Layout container'ı DOM'a ekle
+      appRoot.innerHTML = "";
+      appRoot.appendChild(layoutContainer);
+      
+      // Route handler'a outlet'i geç
+      match.route.onEnter(match.params, match.query, match.hash, outlet);
     } else {
       match.route.onEnter(match.params, match.query, match.hash);
     }

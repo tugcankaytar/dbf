@@ -115,18 +115,22 @@ function endRender(component) {
   ctx.isRendering = false;
   for (const hook of ctx.hooks) {
     if (hook.type === "effect") {
-      if (hook.cleanup) {
-        try {
-          hook.cleanup();
-        } catch (error) {
-          console.error("[dbf-core:hooks] Effect cleanup error:", error);
+      const effectHook = hook;
+      if (effectHook._shouldRun) {
+        if (effectHook.cleanup) {
+          try {
+            effectHook.cleanup();
+          } catch (error) {
+            console.error("[dbf-core:hooks] Effect cleanup error:", error);
+          }
         }
-      }
-      try {
-        const cleanup = hook.effect();
-        hook.cleanup = typeof cleanup === "function" ? cleanup : void 0;
-      } catch (error) {
-        console.error("[dbf-core:hooks] Effect error:", error);
+        try {
+          const cleanup = effectHook.effect();
+          effectHook.cleanup = typeof cleanup === "function" ? cleanup : void 0;
+        } catch (error) {
+          console.error("[dbf-core:hooks] Effect error:", error);
+        }
+        effectHook._shouldRun = false;
       }
     }
   }
@@ -345,21 +349,14 @@ function defineComponent(tag, options) {
       });
     }
     render() {
-      startRender(this);
-      globalThis.__DBF_CURRENT_COMPONENT__ = this;
-      try {
-        const body = options.render({
-          state: this.state,
-          props: this.props,
-          html,
-          host: this
-        });
-        const tpl = stylesPrefix && !body.includes("<style") ? `<style>${stylesPrefix}</style>${body}` : stylesPrefix ? `<style>${stylesPrefix}</style>${body}` : body;
-        render(this.root, tpl);
-      } finally {
-        endRender(this);
-        globalThis.__DBF_CURRENT_COMPONENT__ = void 0;
-      }
+      const body = options.render({
+        state: this.state,
+        props: this.props,
+        html,
+        host: this
+      });
+      const tpl = stylesPrefix && !body.includes("<style") ? `<style>${stylesPrefix}</style>${body}` : stylesPrefix ? `<style>${stylesPrefix}</style>${body}` : body;
+      render(this.root, tpl);
     }
   }
   define(tag, Impl);
@@ -722,15 +719,21 @@ function useEffect(effect, deps) {
     throw new Error("[dbf-core:useEffect] useEffect can only be called inside a component");
   }
   const hook = getCurrentHook(component, () => createEffectHook(effect, deps, false));
-  if (hook.deps !== void 0 && deps !== void 0) {
-    if (shallowEqual(hook.deps, deps)) {
-      return;
-    }
-  } else if (hook.deps === deps) {
-    return;
+  let shouldRun = false;
+  if (hook.deps === void 0 && deps === void 0) {
+    shouldRun = true;
+  } else if (hook.deps === void 0 || deps === void 0) {
+    shouldRun = true;
+  } else if (!shallowEqual(hook.deps, deps)) {
+    shouldRun = true;
   }
-  hook.effect = effect;
-  hook.deps = deps;
+  if (shouldRun) {
+    hook.effect = effect;
+    hook.deps = deps;
+    hook._shouldRun = true;
+  } else {
+    hook._shouldRun = false;
+  }
 }
 function useLayoutEffect(effect, deps) {
   const component = globalThis.__DBF_CURRENT_COMPONENT__;
@@ -738,15 +741,21 @@ function useLayoutEffect(effect, deps) {
     throw new Error("[dbf-core:useLayoutEffect] useLayoutEffect can only be called inside a component");
   }
   const hook = getCurrentHook(component, () => createEffectHook(effect, deps, true));
-  if (hook.deps !== void 0 && deps !== void 0) {
-    if (shallowEqual(hook.deps, deps)) {
-      return;
-    }
-  } else if (hook.deps === deps) {
-    return;
+  let shouldRun = false;
+  if (hook.deps === void 0 && deps === void 0) {
+    shouldRun = true;
+  } else if (hook.deps === void 0 || deps === void 0) {
+    shouldRun = true;
+  } else if (!shallowEqual(hook.deps, deps)) {
+    shouldRun = true;
   }
-  hook.effect = effect;
-  hook.deps = deps;
+  if (shouldRun) {
+    hook.effect = effect;
+    hook.deps = deps;
+    hook._shouldRun = true;
+  } else {
+    hook._shouldRun = false;
+  }
 }
 
 // src/hooks/useMemo.ts
@@ -886,6 +895,13 @@ function useContext(context) {
           }
         };
         contextValue.listeners.add(listener);
+        const originalUnmount = component.componentWillUnmount;
+        component.componentWillUnmount = function() {
+          contextValue.listeners.delete(listener);
+          if (originalUnmount) {
+            originalUnmount.call(this);
+          }
+        };
         return contextValue.value;
       }
     }
@@ -911,7 +927,7 @@ function provideContext(host, context, value) {
       contextValue.listeners.forEach((fn) => fn());
     }
   };
-  contextValue.update = updateValue;
+  return updateValue;
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
