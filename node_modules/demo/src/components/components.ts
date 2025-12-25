@@ -1,4 +1,6 @@
 import "/src/style.css";
+// Setup i18n dictionaries before components use them
+import "../i18n-setup";
 // Register all demo components in one place
 import "./dbf-counter";
 import "./dbf-input";

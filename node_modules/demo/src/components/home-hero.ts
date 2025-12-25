@@ -1,6 +1,5 @@
-import { defineComponent } from "dbf-core";
+import { defineComponent, getStrings } from "dbf-core";
 import styles from "./home-hero.css?inline";
-import { getStrings } from "../middlewares/language";
 
 defineComponent("home-hero", {
   styles,

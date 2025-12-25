@@ -1,12 +1,5 @@
-import { defineComponent } from "dbf-core";
+import { defineComponent, getLanguage, setLanguage, getStrings, onLanguageChange, type LanguageCode } from "dbf-core";
 import styles from "./home-menu.css?inline";
-import {
-  getLanguage,
-  setLanguage,
-  getStrings,
-  onLanguageChange,
-  type LanguageCode,
-} from "../middlewares/language";
 
 type HomeMenuState = {
   lang: LanguageCode;
