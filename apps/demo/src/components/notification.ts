@@ -84,7 +84,7 @@ defineComponent("dbf-notification", {
 
       <div class="toast ${type}">
         <p>${message}</p>
-        <button type="button" data-action="close">Close</button>
+        <button type="button" data-action="close">X</button>
       </div>
     `;
   },

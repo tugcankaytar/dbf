@@ -19,7 +19,7 @@ defineComponent("demo-data-fetch", {
   render({ html }) {
     const [userData] = useState<{ name: string; email: string } | null>(null);
     const [loading] = useState(true);
-    // Burada `p` etiketi için olan CSS'i değiştiriyoruz:
+
     useEffect(() => {
       if (userData) {
         console.log("Veriler güncellendi", userData);

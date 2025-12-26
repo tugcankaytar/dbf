@@ -1,5 +1,8 @@
 export type NotifyType = "success" | "error" | "info";
 
+// Side-effect import: registers <dbf-notification> custom element
+import "./notification";
+
 export type NotifyOptions = {
   message: string;
   duration?: number;   // ms
