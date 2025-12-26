@@ -12,6 +12,11 @@ import "./home-features";
 import "./home-newsletter";
 import "./home-menu";
 import "./home-footer";
+// New feature demos
+import "./demo-hooks";
+import "./demo-context";
+import "./demo-error-boundary";
+import "./demo-data-fetch";
 // Router demo integration
 import "../routes/router";
 

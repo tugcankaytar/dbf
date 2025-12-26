@@ -50,6 +50,7 @@ defineComponent<HomeMenuState>("home-menu", {
           <a href="/">${menu.overview}</a>
           <a href="/docs">${menu.docs}</a>
           <a href="/components">${menu.components}</a>
+          <a href="/data-fetch">Data Fetch</a>
         </nav>
         <div class="actions">
         <button class="btn small ghost">${menu.star}</button>

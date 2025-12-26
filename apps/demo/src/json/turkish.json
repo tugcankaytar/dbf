@@ -52,10 +52,22 @@
     "body": "DBF Core, tarayıcının yerel bileşen modelinin üzerinde küçük ve tahmin edilebilir bir API sunar."
   },
   "componentsPage": {
+    "title": "Bileşen Örnekleri",
+    "subtitle": "Tüm DBF Core özelliklerini interaktif örneklerle keşfedin",
     "cardTitle": "dbf-card",
-    "cardDescription": "Minimal ve esnek bir kart bileşeni.",
-    "counterTitle": "Sayaç demosu",
-    "counterDescription": "Birkaç satır kodla lokal state ve event örneği."
+    "cardDescription": "Props ve slot'larla minimal ve esnek bir kart bileşeni.",
+    "counterTitle": "Sayaç (Class Component)",
+    "counterDescription": "State ve lifecycle ile geleneksel class tabanlı bileşen.",
+    "inputTitle": "dbf-input",
+    "inputDescription": "Tip güvenli props ve stillerle input bileşeni.",
+    "statTitle": "dbf-stat",
+    "statDescription": "Metrikleri göstermek için stat bileşeni.",
+    "hooksTitle": "Hooks Örnekleri",
+    "hooksDescription": "React-benzeri hooks: useState, useEffect, useMemo, useCallback, useReducer",
+    "contextTitle": "Context API",
+    "contextDescription": "createContext ve useContext ile global state yönetimi",
+    "errorBoundaryTitle": "Error Boundary",
+    "errorBoundaryDescription": "Hata izolasyonu ve fallback UI gösterimi"
   }
 }
 

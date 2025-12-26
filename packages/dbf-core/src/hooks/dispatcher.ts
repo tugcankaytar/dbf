@@ -21,6 +21,9 @@ export function getHooksContext(component: any): HooksContext {
     };
     hooksMap.set(component, ctx);
   }
+  // Component'e her zaman ekle (mount'tan erişim için)
+  // Bu sayede context her zaman erişilebilir olur
+  (component as any).__hooks__ = ctx;
   return ctx;
 }
 

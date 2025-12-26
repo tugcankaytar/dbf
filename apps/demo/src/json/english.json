@@ -52,9 +52,21 @@
     "body": "DBF Core gives you a small, predictable API on top of the browser's native component model."
   },
   "componentsPage": {
+    "title": "Component Examples",
+    "subtitle": "Explore all DBF Core features with interactive examples",
     "cardTitle": "dbf-card",
-    "cardDescription": "A minimal, flexible card component.",
-    "counterTitle": "Counter demo",
-    "counterDescription": "Local state and events in just a few lines of code."
+    "cardDescription": "A minimal, flexible card component with props and slots.",
+    "counterTitle": "Counter (Class Component)",
+    "counterDescription": "Traditional class-based component with state and lifecycle.",
+    "inputTitle": "dbf-input",
+    "inputDescription": "Input component with typed props and styles.",
+    "statTitle": "dbf-stat",
+    "statDescription": "Stat component for displaying metrics.",
+    "hooksTitle": "Hooks Examples",
+    "hooksDescription": "React-like hooks: useState, useEffect, useMemo, useCallback, useReducer",
+    "contextTitle": "Context API",
+    "contextDescription": "Global state management with createContext and useContext",
+    "errorBoundaryTitle": "Error Boundary",
+    "errorBoundaryDescription": "Error isolation and fallback UI demonstration"
   }
 }
