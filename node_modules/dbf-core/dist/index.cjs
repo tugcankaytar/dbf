@@ -103,6 +103,7 @@ function getHooksContext(component) {
     };
     hooksMap.set(component, ctx);
   }
+  component.__hooks__ = ctx;
   return ctx;
 }
 function startRender(component) {

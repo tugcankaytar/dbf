@@ -15,7 +15,7 @@ defineComponent("home-hero", {
         </p>
         <div class="hero-actions">
           <button class="btn primary">${dict.primaryCta}</button>
-          <button class="btn ghost">${dict.secondaryCta}</button>
+          <a class="remove-underline btn ghost" href="/docs">${dict.secondaryCta}</a>
         </div>
         <p class="hero-meta">${dict.meta}</p>
       </section>
