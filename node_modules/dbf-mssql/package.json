@@ -1,0 +1,40 @@
+{
+  "name": "dbf-mssql",
+  "version": "0.1.0",
+  "description": "DBF MSSQL: .env-driven MSSQL client focused on stored procedures",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "dev": "tsup src/index.ts --watch --format esm,cjs --dts",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@types/mssql": "^9.1.7",
+    "dotenv": "^16.6.1",
+    "mssql": "^11.0.1"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
+

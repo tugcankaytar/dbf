@@ -9,6 +9,8 @@
     "build:core": "cd packages/dbf-core && npm run build",
     "dev:core": "cd packages/dbf-core && npm run dev",
     "build:router": "cd packages/dbf-router && npm run build",
-    "dev:router": "cd packages/dbf-router && npm run dev"
+    "dev:router": "cd packages/dbf-router && npm run dev",
+    "build:mssql": "cd packages/dbf-mssql && npm run build",
+    "dev:mssql": "cd packages/dbf-mssql && npm run dev"
   }
 }
