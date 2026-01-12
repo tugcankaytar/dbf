@@ -39,7 +39,8 @@ __export(index_exports, {
 });
 module.exports = __toCommonJS(index_exports);
 var import_dotenv = __toESM(require("dotenv"), 1);
-var sql = __toESM(require("mssql"), 1);
+var sqlImport = __toESM(require("mssql"), 1);
+var sql = sqlImport.default ?? sqlImport;
 function param(value, type) {
   return { value, type };
 }

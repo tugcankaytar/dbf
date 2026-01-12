@@ -1,9 +1,13 @@
 import dotenv from "dotenv";
-import * as sql from "mssql";
+import * as sqlImport from "mssql";
 
-export { sql };
+/**
+ * `mssql` is CommonJS. When consumed from ESM, its exports may appear under `default`.
+ * Normalize it so `sql.ConnectionPool` works reliably in both ESM and CJS runtimes.
+ */
+export const sql = ((sqlImport as any).default ?? sqlImport) as typeof import("mssql");
 
-export type DbfMssqlConfig = sql.config;
+export type DbfMssqlConfig = import("mssql").config;
 
 export type DbfMssqlEnvOptions = {
   /**
@@ -40,7 +44,7 @@ export type DbfMssqlTypedParam = {
    * Prefer passing a fully constructed type, e.g. `sql.VarChar(50)` / `sql.NVarChar(sql.MAX)`.
    * You can also pass a factory like `sql.Int`.
    */
-  type?: sql.ISqlTypeFactory | sql.ISqlType;
+  type?: import("mssql").ISqlTypeFactory | import("mssql").ISqlType;
 };
 
 export type DbfMssqlOutputParam = {
@@ -48,7 +52,7 @@ export type DbfMssqlOutputParam = {
    * Prefer passing a fully constructed type, e.g. `sql.VarChar(50)` / `sql.NVarChar(sql.MAX)`.
    * You can also pass a factory like `sql.Int`.
    */
-  type: sql.ISqlTypeFactory | sql.ISqlType;
+  type: import("mssql").ISqlTypeFactory | import("mssql").ISqlType;
 };
 
 export type DbfMssqlInputs = Record<string, unknown>;
@@ -60,7 +64,10 @@ export type DbfMssqlOutputs = Record<string, DbfMssqlOutputParam>;
  * Example:
  * `Name: param("Ada", sql.NVarChar(50))`
  */
-export function param(value: unknown, type?: sql.ISqlTypeFactory | sql.ISqlType): DbfMssqlTypedParam {
+export function param(
+  value: unknown,
+  type?: import("mssql").ISqlTypeFactory | import("mssql").ISqlType
+): DbfMssqlTypedParam {
   return { value, type };
 }
 
@@ -191,7 +198,7 @@ export function mssqlConfigFromEnv(options: DbfMssqlEnvOptions = {}): DbfMssqlCo
   return config;
 }
 
-function applyInput(request: sql.Request, name: string, param: unknown): void {
+function applyInput(request: import("mssql").Request, name: string, param: unknown): void {
   if (isTypedParam(param)) {
     const p = param;
     if (p.type) {
@@ -205,14 +212,14 @@ function applyInput(request: sql.Request, name: string, param: unknown): void {
   request.input(name, param as any);
 }
 
-function applyOutput(request: sql.Request, name: string, param: DbfMssqlOutputParam): void {
+function applyOutput(request: import("mssql").Request, name: string, param: DbfMssqlOutputParam): void {
   // mssql output signature overloads vary; keep it simple and rely on types.
   request.output(name, param.type as any);
 }
 
 export class DbfMssqlClient {
   private readonly config: DbfMssqlConfig;
-  private poolPromise: Promise<sql.ConnectionPool> | null = null;
+  private poolPromise: Promise<import("mssql").ConnectionPool> | null = null;
 
   constructor(config: DbfMssqlConfig, options: DbfMssqlClientOptions = {}) {
     this.config = config;
@@ -222,7 +229,7 @@ export class DbfMssqlClient {
   /**
    * Ensures the underlying connection pool is created + connected.
    */
-  async connect(): Promise<sql.ConnectionPool> {
+  async connect(): Promise<import("mssql").ConnectionPool> {
     if (this.poolPromise) return this.poolPromise;
 
     this.poolPromise = (async () => {
@@ -262,7 +269,7 @@ export class DbfMssqlClient {
   async query<TRecord = any>(
     sqlText: string,
     inputs: DbfMssqlInputs = {}
-  ): Promise<sql.IResult<TRecord>> {
+  ): Promise<import("mssql").IResult<TRecord>> {
     const pool = await this.connect();
     const request = pool.request();
     for (const [name, value] of Object.entries(inputs)) applyInput(request, name, value);
@@ -278,7 +285,7 @@ export class DbfMssqlClient {
     procName: string,
     inputs: DbfMssqlInputs = {},
     outputs: DbfMssqlOutputs = {}
-  ): Promise<sql.IProcedureResult<TRecord>> {
+  ): Promise<import("mssql").IProcedureResult<TRecord>> {
     const pool = await this.connect();
     const request = pool.request();
     for (const [name, value] of Object.entries(inputs)) applyInput(request, name, value);
@@ -307,7 +314,7 @@ export async function execProcFromEnv<TRecord = any>(
   inputs: DbfMssqlInputs = {},
   outputs: DbfMssqlOutputs = {},
   envOptions: DbfMssqlEnvOptions = {}
-): Promise<sql.IProcedureResult<TRecord>> {
+): Promise<import("mssql").IProcedureResult<TRecord>> {
   const client = createMssqlClientFromEnv(envOptions);
   try {
     return await client.execProc<TRecord>(procName, inputs, outputs);

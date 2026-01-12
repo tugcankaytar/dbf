@@ -1,6 +1,7 @@
 // src/index.ts
 import dotenv from "dotenv";
-import * as sql from "mssql";
+import * as sqlImport from "mssql";
+var sql = sqlImport.default ?? sqlImport;
 function param(value, type) {
   return { value, type };
 }

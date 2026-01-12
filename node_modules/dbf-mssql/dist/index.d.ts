@@ -1,7 +1,11 @@
-import * as sql from 'mssql';
-export { sql };
+import * as mssql from 'mssql';
 
-type DbfMssqlConfig = sql.config;
+/**
+ * `mssql` is CommonJS. When consumed from ESM, its exports may appear under `default`.
+ * Normalize it so `sql.ConnectionPool` works reliably in both ESM and CJS runtimes.
+ */
+declare const sql: typeof mssql;
+type DbfMssqlConfig = mssql.config;
 type DbfMssqlEnvOptions = {
     /**
      * Env var prefix. Defaults to `DBF_MSSQL_`.
@@ -35,14 +39,14 @@ type DbfMssqlTypedParam = {
      * Prefer passing a fully constructed type, e.g. `sql.VarChar(50)` / `sql.NVarChar(sql.MAX)`.
      * You can also pass a factory like `sql.Int`.
      */
-    type?: sql.ISqlTypeFactory | sql.ISqlType;
+    type?: mssql.ISqlTypeFactory | mssql.ISqlType;
 };
 type DbfMssqlOutputParam = {
     /**
      * Prefer passing a fully constructed type, e.g. `sql.VarChar(50)` / `sql.NVarChar(sql.MAX)`.
      * You can also pass a factory like `sql.Int`.
      */
-    type: sql.ISqlTypeFactory | sql.ISqlType;
+    type: mssql.ISqlTypeFactory | mssql.ISqlType;
 };
 type DbfMssqlInputs = Record<string, unknown>;
 type DbfMssqlOutputs = Record<string, DbfMssqlOutputParam>;
@@ -52,7 +56,7 @@ type DbfMssqlOutputs = Record<string, DbfMssqlOutputParam>;
  * Example:
  * `Name: param("Ada", sql.NVarChar(50))`
  */
-declare function param(value: unknown, type?: sql.ISqlTypeFactory | sql.ISqlType): DbfMssqlTypedParam;
+declare function param(value: unknown, type?: mssql.ISqlTypeFactory | mssql.ISqlType): DbfMssqlTypedParam;
 /**
  * Reads MSSQL config from environment variables (optionally loading `.env` via `dotenv`).
  *
@@ -70,7 +74,7 @@ declare class DbfMssqlClient {
     /**
      * Ensures the underlying connection pool is created + connected.
      */
-    connect(): Promise<sql.ConnectionPool>;
+    connect(): Promise<mssql.ConnectionPool>;
     /**
      * Closes the connection pool (if created).
      */
@@ -78,13 +82,13 @@ declare class DbfMssqlClient {
     /**
      * Executes a raw SQL query with optional input parameters.
      */
-    query<TRecord = any>(sqlText: string, inputs?: DbfMssqlInputs): Promise<sql.IResult<TRecord>>;
+    query<TRecord = any>(sqlText: string, inputs?: DbfMssqlInputs): Promise<mssql.IResult<TRecord>>;
     /**
      * Executes a stored procedure.
      *
      * Returns the underlying `mssql` execute result (recordsets, output params, returnValue).
      */
-    execProc<TRecord = any>(procName: string, inputs?: DbfMssqlInputs, outputs?: DbfMssqlOutputs): Promise<sql.IProcedureResult<TRecord>>;
+    execProc<TRecord = any>(procName: string, inputs?: DbfMssqlInputs, outputs?: DbfMssqlOutputs): Promise<mssql.IProcedureResult<TRecord>>;
 }
 /**
  * Convenience helper: create a `DbfMssqlClient` using `.env` / `process.env`.
@@ -94,6 +98,6 @@ declare function createMssqlClientFromEnv(envOptions?: DbfMssqlEnvOptions, clien
  * Convenience helper: execute a stored procedure using `.env` / `process.env`,
  * then close the connection pool.
  */
-declare function execProcFromEnv<TRecord = any>(procName: string, inputs?: DbfMssqlInputs, outputs?: DbfMssqlOutputs, envOptions?: DbfMssqlEnvOptions): Promise<sql.IProcedureResult<TRecord>>;
+declare function execProcFromEnv<TRecord = any>(procName: string, inputs?: DbfMssqlInputs, outputs?: DbfMssqlOutputs, envOptions?: DbfMssqlEnvOptions): Promise<mssql.IProcedureResult<TRecord>>;
 
-export { DbfMssqlClient, type DbfMssqlClientOptions, type DbfMssqlConfig, type DbfMssqlEnvOptions, type DbfMssqlInputs, type DbfMssqlOutputParam, type DbfMssqlOutputs, type DbfMssqlTypedParam, createMssqlClientFromEnv, execProcFromEnv, mssqlConfigFromEnv, param };
+export { DbfMssqlClient, type DbfMssqlClientOptions, type DbfMssqlConfig, type DbfMssqlEnvOptions, type DbfMssqlInputs, type DbfMssqlOutputParam, type DbfMssqlOutputs, type DbfMssqlTypedParam, createMssqlClientFromEnv, execProcFromEnv, mssqlConfigFromEnv, param, sql };
