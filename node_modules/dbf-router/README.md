@@ -42,6 +42,13 @@ router.start();
 
 When the location changes (via `navigate` or the back/forward buttons), the corresponding `onEnter` handler is called.
 
+`onEnter` receives `(params, query, hash, outlet?)`:
+
+- `params`: route params (e.g. `/users/:id`)
+- `query`: parsed query string (`?a=1&b=2`)
+- `hash`: hash fragment (e.g. `#section`)
+- `outlet`: only for layout routes
+
 ---
 
 ## Link behaviour (`enableLinkNavigation`)
@@ -90,7 +97,7 @@ dispose();
 
 ## Route configuration
 
-The router accepts a very small configuration object:
+The router accepts a small configuration object:
 
 ```ts
 import type { RouterOptions } from "dbf-router";
@@ -101,13 +108,23 @@ const options: RouterOptions = {
     { path: "/", onEnter: () => {/* ... */} },
     { path: "/docs", onEnter: () => {/* ... */} },
   ],
+  onNotFound: (path) => {
+    console.warn("No route for", path);
+  },
 };
 ```
 
 - `basePath` (optional) – if your app is served under a sub‑path (`/app`), all matching is done relative to that.
 - `routes` – an array of `{ path, onEnter }` objects.
+- `onNotFound` (optional) – called when no route matches.
 
-> Note: There is deliberately no built‑in support for nested routes, loaders, or complex matching yet. The goal is to keep the core small and let you build higher‑level patterns on top as needed.
+Additional capabilities already supported:
+
+- **Params**: `/users/:id`
+- **Wildcard**: `/docs/*`
+- **Nested routes** via `children`
+- **Route guards** via `beforeEnter` (return `false` to block or a string to redirect)
+- **Layout routes** via `layout(root, outlet)` + `outlet` passed to `onEnter`
 
 ---
 

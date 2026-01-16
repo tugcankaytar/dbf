@@ -130,7 +130,12 @@ function createRouter(options) {
       options.routes,
       basePath
     );
-    if (!match) return;
+    if (!match) {
+      options.onNotFound?.(
+        window.location.pathname + window.location.search + window.location.hash
+      );
+      return;
+    }
     if (match.route.beforeEnter) {
       const guardResult = match.route.beforeEnter(match.params, match.query, match.hash);
       if (guardResult === false) {

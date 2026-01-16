@@ -86,8 +86,12 @@ export abstract class DBFComponent<
     this.invalidate();
   }
 
-  setState(patch: Partial<S>) {
-    this.state = { ...(this.state as any), ...(patch as any) };
+  /**
+   * Merge partial state or compute it from the previous state.
+   */
+  setState(patch: Partial<S> | ((prev: S) => Partial<S>)) {
+    const nextPatch = typeof patch === "function" ? patch(this.state) : patch;
+    this.state = { ...(this.state as any), ...(nextPatch as any) };
     this.invalidate();
   }
 

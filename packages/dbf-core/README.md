@@ -87,6 +87,7 @@ Key ideas:
 - `state` is initialized once per instance via `state: () => ({ ... })`.
 - `render` is called whenever state/props change.
 - `mount` runs once after the component is attached; you typically use it for event delegation via `on(root, "click", "[data-action='inc']", handler)`.
+- `setState` accepts a partial object **or a function**: `setState(prev => ({ count: prev.count + 1 }))`.
 
 ---
 

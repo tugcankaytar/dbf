@@ -21,7 +21,7 @@ export interface ComponentMountCtx<S extends StateObj, P extends PropsObj> {
   on: typeof on;
   state: S;
   props: P;
-  setState(patch: Partial<S>): void;
+  setState(patch: Partial<S> | ((prev: S) => Partial<S>)): void;
   host: DBFComponent<S, P>;
 }
 

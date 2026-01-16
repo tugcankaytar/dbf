@@ -126,6 +126,11 @@ await execProcFromEnv("dbo.SaveUser", {
 - `param(value, type?)`: build a typed input param
 - `sql`: normalized `mssql` module exports (works in ESM and CJS)
 
+Additional helpers on `DbfMssqlClient`:
+
+- `ping()` – simple `select 1` health check
+- `withTransaction(fn)` – runs a function inside a SQL transaction (auto commit/rollback)
+
 ---
 
 ## Security / architecture note
@@ -135,3 +140,34 @@ Do not connect to MSSQL from the browser. Use:
 - **Frontend** → calls your backend API
 - **Backend (Node.js)** → uses `dbf-mssql` to run procs/queries
 
+---
+
+## Transactions (example)
+
+```ts
+import { createMssqlClientFromEnv } from "dbf-mssql";
+
+const client = createMssqlClientFromEnv();
+
+await client.withTransaction(async (tx) => {
+  const request = tx.request();
+  await request.query("update Users set active = 1 where id = 42");
+  await request.query("insert into Logs(message) values('user activated')");
+});
+```
+
+---
+
+## Optional logging hook
+
+```ts
+import { createMssqlClientFromEnv } from "dbf-mssql";
+
+const client = createMssqlClientFromEnv({}, {
+  log: (event) => {
+    if (event.type.endsWith(":error")) {
+      console.error(event);
+    }
+  },
+});
+```

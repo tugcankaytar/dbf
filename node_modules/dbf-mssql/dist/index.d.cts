@@ -32,6 +32,10 @@ type DbfMssqlClientOptions = {
      * Default: false (lazy connect on first use).
      */
     eager?: boolean;
+    /**
+     * Optional hook for lightweight logging/telemetry.
+     */
+    log?: (event: DbfMssqlLogEvent) => void;
 };
 type DbfMssqlTypedParam = {
     value: unknown;
@@ -50,6 +54,39 @@ type DbfMssqlOutputParam = {
 };
 type DbfMssqlInputs = Record<string, unknown>;
 type DbfMssqlOutputs = Record<string, DbfMssqlOutputParam>;
+type DbfMssqlLogEvent = {
+    type: "connect";
+    elapsedMs: number;
+} | {
+    type: "connect:error";
+    elapsedMs: number;
+    error: unknown;
+} | {
+    type: "query";
+    sqlText: string;
+    elapsedMs: number;
+} | {
+    type: "query:error";
+    sqlText: string;
+    elapsedMs: number;
+    error: unknown;
+} | {
+    type: "execProc";
+    procName: string;
+    elapsedMs: number;
+} | {
+    type: "execProc:error";
+    procName: string;
+    elapsedMs: number;
+    error: unknown;
+} | {
+    type: "transaction";
+    elapsedMs: number;
+} | {
+    type: "transaction:error";
+    elapsedMs: number;
+    error: unknown;
+};
 /**
  * Helper to create a typed input param.
  *
@@ -69,6 +106,7 @@ declare function param(value: unknown, type?: mssql.ISqlTypeFactory | mssql.ISql
 declare function mssqlConfigFromEnv(options?: DbfMssqlEnvOptions): DbfMssqlConfig;
 declare class DbfMssqlClient {
     private readonly config;
+    private readonly log?;
     private poolPromise;
     constructor(config: DbfMssqlConfig, options?: DbfMssqlClientOptions);
     /**
@@ -89,6 +127,14 @@ declare class DbfMssqlClient {
      * Returns the underlying `mssql` execute result (recordsets, output params, returnValue).
      */
     execProc<TRecord = any>(procName: string, inputs?: DbfMssqlInputs, outputs?: DbfMssqlOutputs): Promise<mssql.IProcedureResult<TRecord>>;
+    /**
+     * Executes a simple `select 1` to verify connectivity.
+     */
+    ping(): Promise<boolean>;
+    /**
+     * Runs a function inside a SQL transaction (auto commit/rollback).
+     */
+    withTransaction<T>(fn: (tx: mssql.Transaction) => Promise<T>): Promise<T>;
 }
 /**
  * Convenience helper: create a `DbfMssqlClient` using `.env` / `process.env`.
@@ -100,4 +146,4 @@ declare function createMssqlClientFromEnv(envOptions?: DbfMssqlEnvOptions, clien
  */
 declare function execProcFromEnv<TRecord = any>(procName: string, inputs?: DbfMssqlInputs, outputs?: DbfMssqlOutputs, envOptions?: DbfMssqlEnvOptions): Promise<mssql.IProcedureResult<TRecord>>;
 
-export { DbfMssqlClient, type DbfMssqlClientOptions, type DbfMssqlConfig, type DbfMssqlEnvOptions, type DbfMssqlInputs, type DbfMssqlOutputParam, type DbfMssqlOutputs, type DbfMssqlTypedParam, createMssqlClientFromEnv, execProcFromEnv, mssqlConfigFromEnv, param, sql };
+export { DbfMssqlClient, type DbfMssqlClientOptions, type DbfMssqlConfig, type DbfMssqlEnvOptions, type DbfMssqlInputs, type DbfMssqlLogEvent, type DbfMssqlOutputParam, type DbfMssqlOutputs, type DbfMssqlTypedParam, createMssqlClientFromEnv, execProcFromEnv, mssqlConfigFromEnv, param, sql };
