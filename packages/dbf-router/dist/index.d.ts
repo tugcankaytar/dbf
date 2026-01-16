@@ -17,6 +17,10 @@ interface RouteConfig {
 interface RouterOptions {
     basePath?: string;
     routes: RouteConfig[];
+    /**
+     * Called when no route matches the current location.
+     */
+    onNotFound?: (path: string) => void;
 }
 interface Router {
     navigate(path: string): void;

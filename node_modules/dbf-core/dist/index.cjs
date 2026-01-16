@@ -237,8 +237,12 @@ var DBFComponent = class extends HTMLElement {
   propsChanged(_prev, _next) {
     this.invalidate();
   }
+  /**
+   * Merge partial state or compute it from the previous state.
+   */
   setState(patch) {
-    this.state = { ...this.state, ...patch };
+    const nextPatch = typeof patch === "function" ? patch(this.state) : patch;
+    this.state = { ...this.state, ...nextPatch };
     this.invalidate();
   }
   /**

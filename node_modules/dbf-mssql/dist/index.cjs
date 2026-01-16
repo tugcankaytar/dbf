@@ -154,9 +154,11 @@ function applyOutput(request, name, param2) {
 }
 var DbfMssqlClient = class {
   config;
+  log;
   poolPromise = null;
   constructor(config, options = {}) {
     this.config = config;
+    this.log = options.log;
     if (options.eager) void this.connect();
   }
   /**
@@ -165,11 +167,14 @@ var DbfMssqlClient = class {
   async connect() {
     if (this.poolPromise) return this.poolPromise;
     this.poolPromise = (async () => {
+      const started = Date.now();
       const pool = new sql.ConnectionPool(this.config);
       try {
         await pool.connect();
+        this.log?.({ type: "connect", elapsedMs: Date.now() - started });
         return pool;
       } catch (err) {
+        this.log?.({ type: "connect:error", elapsedMs: Date.now() - started, error: err });
         try {
           pool.close();
         } catch {
@@ -197,7 +202,15 @@ var DbfMssqlClient = class {
     const pool = await this.connect();
     const request = pool.request();
     for (const [name, value] of Object.entries(inputs)) applyInput(request, name, value);
-    return request.query(sqlText);
+    const started = Date.now();
+    try {
+      const result = await request.query(sqlText);
+      this.log?.({ type: "query", sqlText, elapsedMs: Date.now() - started });
+      return result;
+    } catch (err) {
+      this.log?.({ type: "query:error", sqlText, elapsedMs: Date.now() - started, error: err });
+      throw err;
+    }
   }
   /**
    * Executes a stored procedure.
@@ -209,7 +222,48 @@ var DbfMssqlClient = class {
     const request = pool.request();
     for (const [name, value] of Object.entries(inputs)) applyInput(request, name, value);
     for (const [name, value] of Object.entries(outputs)) applyOutput(request, name, value);
-    return request.execute(procName);
+    const started = Date.now();
+    try {
+      const result = await request.execute(procName);
+      this.log?.({ type: "execProc", procName, elapsedMs: Date.now() - started });
+      return result;
+    } catch (err) {
+      this.log?.({ type: "execProc:error", procName, elapsedMs: Date.now() - started, error: err });
+      throw err;
+    }
+  }
+  /**
+   * Executes a simple `select 1` to verify connectivity.
+   */
+  async ping() {
+    try {
+      const result = await this.query("select 1 as ok");
+      return result.recordset?.[0]?.ok === 1;
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Runs a function inside a SQL transaction (auto commit/rollback).
+   */
+  async withTransaction(fn) {
+    const pool = await this.connect();
+    const started = Date.now();
+    const tx = new sql.Transaction(pool);
+    try {
+      await tx.begin();
+      const result = await fn(tx);
+      await tx.commit();
+      this.log?.({ type: "transaction", elapsedMs: Date.now() - started });
+      return result;
+    } catch (err) {
+      try {
+        await tx.rollback();
+      } catch {
+      }
+      this.log?.({ type: "transaction:error", elapsedMs: Date.now() - started, error: err });
+      throw err;
+    }
   }
 };
 function createMssqlClientFromEnv(envOptions = {}, clientOptions = {}) {

@@ -63,7 +63,10 @@ declare abstract class DBFComponent<S extends Record<string, any> = Record<strin
      * Kullanıcı isterse override edebilir.
      */
     protected propsChanged(_prev: P, _next: P): void;
-    setState(patch: Partial<S>): void;
+    /**
+     * Merge partial state or compute it from the previous state.
+     */
+    setState(patch: Partial<S> | ((prev: S) => Partial<S>)): void;
     /**
      * Kullanıcı `shouldRender` override ederek
      * gereksiz render'ları atlayabilir.
@@ -99,7 +102,7 @@ interface ComponentMountCtx<S extends StateObj, P extends PropsObj> {
     on: typeof on;
     state: S;
     props: P;
-    setState(patch: Partial<S>): void;
+    setState(patch: Partial<S> | ((prev: S) => Partial<S>)): void;
     host: DBFComponent<S, P>;
 }
 interface DefineComponentOptions<S extends StateObj = StateObj, P extends PropsObj = PropsObj> {

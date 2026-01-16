@@ -29,6 +29,10 @@ export interface RouteConfig {
 export interface RouterOptions {
   basePath?: string;
   routes: RouteConfig[];
+  /**
+   * Called when no route matches the current location.
+   */
+  onNotFound?: (path: string) => void;
 }
 
 export interface Router {
@@ -200,7 +204,12 @@ export function createRouter(options: RouterOptions): Router {
       options.routes,
       basePath
     );
-    if (!match) return;
+    if (!match) {
+      options.onNotFound?.(
+        window.location.pathname + window.location.search + window.location.hash
+      );
+      return;
+    }
 
     // beforeEnter guard kontrolü
     if (match.route.beforeEnter) {
