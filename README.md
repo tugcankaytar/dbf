@@ -1,108 +1,146 @@
 ## DBF Monorepo
 
-This repository contains the **DBF** ecosystem:
+Bu repo **DBF** ekosistemini içerir: Web Components tabanlı “HTML-first” UI yaklaşımı + minimal router + Node.js tarafında MSSQL yardımcıları.
 
-- `packages/dbf-core` – lightweight Web Components engine (state, props, render, events)
-- `packages/dbf-router` – minimal, HTML‑first client‑side router
-- `apps/demo` – example app that showcases DBF Core + DBF Router together
-
-The goal is to make **HTML‑first, framework‑agnostic UI** pleasant to work with, while keeping the runtime very small and explicit.
+- **Amaç**: Framework’e bağımlı olmadan (React/Vue şart koşmadan) **küçük, anlaşılır ve modüler** bir geliştirme deneyimi sunmak.
+- **Çıkış formatları**: Paketler `tsup` ile **ESM + CJS + d.ts** üretecek şekilde build edilir.
 
 ---
 
-## 1. Repository layout
+## 1) Önkoşullar
+
+- **Node.js**: `>= 18`
+- **npm**: workspace desteği olan güncel sürüm
+
+---
+
+## 2) Repository yapısı
 
 - **Root**
-  - `package.json` – npm workspaces and build scripts
-  - `README.md` – this file
+  - `package.json`: npm workspaces + root script’ler
+  - `tsconfig.base.json`: ortak TypeScript ayarları
+  - `README.md`: bu doküman
+  - `USAGE.md`: monorepo dışından kullanım alternatifleri (npm publish / link / file)
 
-- **Packages**
-  - `packages/dbf-core` – published as `dbf-core`
-  - `packages/dbf-router` – published as `dbf-router`
+- **Packages** (`packages/*`)
+  - `packages/dbf-core` → publish adı: `dbf-core`
+  - `packages/dbf-router` → publish adı: `dbf-router`
+  - `packages/dbf-mssql` → publish adı: `dbf-mssql`
 
-- **Apps**
-  - `apps/demo` – Vite app used for local development and examples
+- **Apps** (`apps/*`)
+  - `apps/demo`: DBF Core + DBF Router kullanımını gösteren Vite demo
 
 ---
 
-## 2. Getting started (local development)
+## 3) Paketler (overview)
 
-From the repository root:
+| Paket | Nerede çalışır? | Ne sağlar? | Doküman |
+| --- | --- | --- | --- |
+| `dbf-core` | Browser (Custom Elements) | Component tanımı, props/state/render, event delegation, shadow DOM style | `packages/dbf-core/README.md` |
+| `dbf-router` | Browser | Minimal SPA router (`createRouter`, `enableLinkNavigation`) | `packages/dbf-router/README.md` |
+| `dbf-mssql` | **Node.js (server)** | `.env` ile MSSQL pool + query/proc helpers (`execProcFromEnv`, `DbfMssqlClient`) | `packages/dbf-mssql/README.md` |
+
+> Not: `dbf-mssql` tarayıcıda çalışmaz. Frontend → backend API çağrısı şeklinde kullanılmalıdır.
+
+---
+
+## 4) Hızlı başlangıç (local development)
+
+Repo kökünden:
 
 ```bash
-# Install all workspace dependencies
+# Workspace dependency’lerini yükle
 npm install
 
-# Build core libraries
+# Paketleri build et (dist + d.ts üretir)
 npm run build:core
 npm run build:router
+npm run build:mssql
+```
 
-# Start the demo app
+### 4.1 Demo uygulamasını çalıştırma
+
+```bash
 cd apps/demo
 npm install
 npm run dev
 ```
 
-Then open the URL printed by Vite (usually `http://localhost:5173`) in your browser.
+Vite’ın verdiği URL’i (genelde `http://localhost:5173`) aç.
 
 ---
 
-## 3. Packages overview
+## 5) Geliştirme döngüsü (DX)
 
-### 3.1 `dbf-core`
+### 5.1 Watch mode (paket geliştirirken)
 
-DBF Core is a small library that wraps the native Custom Elements APIs with:
+```bash
+# ayrı terminallerde
+npm run dev:core
+npm run dev:router
+npm run dev:mssql
+```
 
-- A `DBFComponent` base class (state, props, lifecycle)
-- A `defineComponent` helper for ergonomic component definitions
-- A minimal `html` + `render` layer (template strings → `shadowRoot.innerHTML`)
-- Typed props via `defineProps` and `PropsFromSchema`
-- A small `on` helper for event delegation
+> DBF paketleri `dist/` altında çıktılar ürettiği için, dış projede kullanıyorsanız watch sırasında **consumer uygulamanın da** yeniden derleme/yenileme ihtiyacı olabilir.
 
-See [`packages/dbf-core/README.md`](packages/dbf-core/README.md) for full API and examples.
+### 5.2 Build çıktısı (paketler)
 
-### 3.2 `dbf-router`
-
-DBF Router is an intentionally tiny router that:
-
-- Uses the History API and DOM only (no framework assumptions)
-- Accepts a list of routes `{ path, onEnter }`
-- Provides `createRouter` and `enableLinkNavigation` to wire up `<a data-nav-route="/path">` links
-
-See [`packages/dbf-router/README.md`](packages/dbf-router/README.md) for full details.
-
-### 3.3 `apps/demo`
-
-The demo app shows how to:
-
-- Register DBF Core components
-- Structure pages under `src/pages`
-- Wire DBF Router under `src/routes/router.ts`
-- Build a small landing page with header / content / footer and multiple routes
-
-This app is a good starting point if you want to see DBF “in action” before using it in your own project.
+Her paket:
+- `dist/index.js` (ESM)
+- `dist/index.cjs` (CJS)
+- `dist/index.d.ts` + `dist/index.d.cts` (TypeScript types)
 
 ---
 
-## 4. Scripts
+## 6) Monorepo dışından kullanım
 
-From the repository root:
+Detaylı seçenekler için `USAGE.md`’ye bakın. Kısa özet:
 
-- **`npm run build:core`** – build `dbf-core` into `packages/dbf-core/dist`
-- **`npm run dev:core`** – watch/build `dbf-core` during development
-- **`npm run build:router`** – build `dbf-router` into `packages/dbf-router/dist`
-- **`npm run dev:router`** – watch/build `dbf-router`
-
-Inside `apps/demo`:
-
-- **`npm run dev`** – start Vite dev server
-- **`npm run build`** – build demo app for production
-- **`npm run preview`** – preview the production build
+- **Local file path** (en basit):
+  - `package.json` → `"dbf-mssql": "file:/absolute/or/relative/path"`
+  - sonra `npm install`
+- **npm link** (local dev için):
+  - pakette `npm link`
+  - consumer projede `npm link dbf-mssql`
+- **npm publish** (prod):
+  - `packages/<pkg>` içinde `npm publish`
 
 ---
 
-## 5. Status
+## 7) `dbf-mssql` için mimari not (önemli)
 
-This project is experimental and evolving. APIs in `dbf-core` and `dbf-router` may change as real‑world usage grows and we refine the ergonomics.
+`dbf-mssql` **Node.js** tarafında çalışır. Doğru mimari:
 
-If you try DBF and run into rough edges, limitations, or have ideas for better APIs, those are exactly the kind of insights that will help shape the project.
+- **Backend**: `dbf-mssql` ile MSSQL’e bağlanır ve proc/query çalıştırır.
+- **Frontend**: backend’deki endpoint’e `fetch`/`axios` ile istek atar.
+
+Tarayıcıda direkt DB bağlantısı:
+- **Güvenli değildir** (credential sızıntısı)
+- Teknik olarak da sorunludur (driver/Buffer vb.)
+
+---
+
+## 8) Script’ler
+
+Repo kökünden:
+
+- **`npm run build:core`**: `dbf-core` build
+- **`npm run dev:core`**: `dbf-core` watch build
+- **`npm run build:router`**: `dbf-router` build
+- **`npm run dev:router`**: `dbf-router` watch build
+- **`npm run build:mssql`**: `dbf-mssql` build
+- **`npm run dev:mssql`**: `dbf-mssql` watch build
+
+Demo içinde (`apps/demo`):
+
+- **`npm run dev`**: Vite dev server
+- **`npm run build`**: production build
+- **`npm run preview`**: build’i serve et
+
+---
+
+## 9) Durum
+
+Bu repo aktif gelişiyor. API’ler (özellikle `dbf-core` / `dbf-router`) gerçek kullanım arttıkça sadeleşebilir veya genişleyebilir.
+
+Geri bildirim/iyileştirme önerileri için paket README’lerindeki örnekleri referans alarak issue/PR açmanız en hızlı yol.
