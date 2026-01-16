@@ -6,7 +6,6 @@ This repository contains the **DBF** ecosystem:
 - **`dbf-router`**: a minimal, HTML-first client-side router
 - **`dbf-mssql`**: Node.js helpers for MSSQL (`.env` config + pool + stored procedures)
 
-
 The goal is to keep the runtime **small and explicit**, while giving you a pleasant developer experience without forcing a framework (React/Vue/etc.).
 
 ---
