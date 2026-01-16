@@ -1,4 +1,4 @@
-# DBF Core
+## DBF Core
 
 **DBF Core** is a tiny Web Components “engine” that gives you:
 
@@ -11,7 +11,7 @@ It’s designed to be **HTML‑first**, framework‑agnostic, and easy to integr
 
 ---
 
-## 1. Installation
+## Installation
 
 ```bash
 npm install dbf-core
@@ -21,7 +21,7 @@ DBF Core is framework‑agnostic and works anywhere you can register Custom Elem
 
 ---
 
-## 2. Quick start: defining a simple component
+## Quick start: define a component
 
 ```ts
 import { defineComponent } from "dbf-core";
@@ -45,7 +45,7 @@ This registers a standard Custom Element `<hello-name>` that reads its props fro
 
 ---
 
-## 3. State and events
+## State and events
 
 DBF Core lets you combine props + internal state + events in a small, React‑like way.
 
@@ -74,9 +74,9 @@ defineComponent<CounterState, CounterProps>("dbf-counter", {
     `;
   },
 
-  mount({ root, on, setState }) {
+  mount({ root, on, setState, host }) {
     on(root, "click", "[data-action='inc']", () => {
-      setState({ count: 1 } as any); // replace with your own update logic
+      setState({ count: host.state.count + 1 });
     });
   },
 });
@@ -90,7 +90,7 @@ Key ideas:
 
 ---
 
-## 4. Per‑component styles
+## Per-component styles
 
 DBF Core supports a `styles` field so you can inject styles into each component’s shadow root. With Vite (or similar bundlers) you can use `?inline` to import CSS as a string.
 
@@ -125,7 +125,7 @@ This keeps your styles **scoped** to the component via shadow DOM, and avoids le
 
 ---
 
-## 5. Typed props with `defineProps` + `PropsFromSchema`
+## Typed props with `defineProps` + `PropsFromSchema`
 
 To avoid duplicating prop definitions in both runtime and TypeScript types, DBF Core exposes a small props helper:
 
@@ -147,7 +147,7 @@ You can then plug `inputProps` directly into `defineComponent`’s options.
 
 ---
 
-## 6. Relationship with the demo app
+## Relationship with the demo app
 
 The `apps/demo` application in this repository:
 

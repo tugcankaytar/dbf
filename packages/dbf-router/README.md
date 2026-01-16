@@ -1,10 +1,10 @@
-# DBF Router
+## DBF Router
 
 Minimal, HTML‑first client‑side router designed to pair nicely with **DBF Core** and native Web Components.
 
 ---
 
-## 1. Features
+## Features
 
 - **Simple core API** – `createRouter({ routes })` + `router.navigate()`
 - **HTML‑first links** – `enableLinkNavigation(router)` wires up `<a data-nav-route="/path">` automatically
@@ -13,7 +13,7 @@ Minimal, HTML‑first client‑side router designed to pair nicely with **DBF Co
 
 ---
 
-## 2. Installation
+## Installation
 
 ```bash
 npm install dbf-router
@@ -21,7 +21,7 @@ npm install dbf-router
 
 ---
 
-## 3. Basic usage
+## Basic usage
 
 ```ts
 import { createRouter, enableLinkNavigation } from "dbf-router";
@@ -44,7 +44,7 @@ When the location changes (via `navigate` or the back/forward buttons), the corr
 
 ---
 
-## 4. Link behaviour (`enableLinkNavigation`)
+## Link behaviour (`enableLinkNavigation`)
 
 `enableLinkNavigation(router, options?)` attaches a global click handler that:
 
@@ -88,7 +88,7 @@ dispose();
 
 ---
 
-## 5. Route configuration
+## Route configuration
 
 The router accepts a very small configuration object:
 
@@ -111,7 +111,7 @@ const options: RouterOptions = {
 
 ---
 
-## 6. Interop with DBF Core
+## Interop with DBF Core
 
 In the demo app (`apps/demo`), DBF Router is used to swap **page components** rendered with DBF Core:
 
@@ -137,7 +137,7 @@ Each `renderX(root)` function composes various DBF Core custom elements, giving 
 
 ---
 
-## 7. Status
+## Status
 
 DBF Router is early and intentionally small. As we learn from real applications, we may add:
 
