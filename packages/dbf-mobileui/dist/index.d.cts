@@ -1,0 +1,25 @@
+declare function registerMobileUI(): void;
+
+declare function defineMobileButton(): void;
+
+declare function defineMobileCard(): void;
+
+declare function defineMobileDrawer(): void;
+
+declare function defineMobileDrawerItem(): void;
+
+declare function defineMobileInput(): void;
+
+declare function defineMobileLink(): void;
+
+declare function defineMobileList(): void;
+
+declare function defineMobileListItem(): void;
+
+declare function defineMobileNavbar(): void;
+
+declare function defineMobileToolbar(): void;
+
+declare function defineMobilePage(): void;
+
+export { defineMobileButton, defineMobileCard, defineMobileDrawer, defineMobileDrawerItem, defineMobileInput, defineMobileLink, defineMobileList, defineMobileListItem, defineMobileNavbar, defineMobilePage, defineMobileToolbar, registerMobileUI };

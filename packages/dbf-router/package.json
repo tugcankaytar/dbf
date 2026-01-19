@@ -1,6 +1,6 @@
 {
   "name": "dbf-router",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "description": "DBF Router: minimal, HTML-first client-side router for DBF Core apps",
   "license": "MIT",
   "type": "module",
