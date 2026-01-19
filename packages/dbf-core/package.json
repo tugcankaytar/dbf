@@ -1,6 +1,6 @@
 {
     "name": "dbf-core",
-    "version": "0.1.0",
+    "version": "1.0.1",
     "description": "DBF Core: component engine (Web Components) + render + events + props",
     "license": "MIT",
     "type": "module",

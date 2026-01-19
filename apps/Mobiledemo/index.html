@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DBF Mobile UI Demo</title>
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <main id="app" class="app-shell">
+      <header class="app-header">
+        <div class="app-header-inner">
+          <button class="menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="app-drawer">
+            <span class="menu-icon" aria-hidden="true"></span>
+          </button>
+          <div class="app-title">DBF Mobile UI</div>
+        </div>
+      </header>
+
+      <div class="app-body">
+        <dbf-mobile-drawer id="app-drawer" 
+        class="app-sidebar" width="220px" side="right" animation="slide">
+          <dbf-mobile-list>
+            <dbf-mobile-drawer-item>
+              <dbf-mobile-link href="/" variant="ghost">Home</dbf-mobile-link>
+            </dbf-mobile-drawer-item>
+            <dbf-mobile-drawer-item>
+              <dbf-mobile-link href="/profile" variant="ghost">Profile</dbf-mobile-link>
+            </dbf-mobile-drawer-item>
+            <dbf-mobile-drawer-item>
+              <dbf-mobile-link href="/settings" variant="ghost">Settings</dbf-mobile-link>
+            </dbf-mobile-drawer-item>
+          </dbf-mobile-list>
+        </dbf-mobile-drawer>
+
+        <section id="app-content" class="app-content"></section>
+      </div>
+
+      <footer class="app-footer">
+        <dbf-mobile-toolbar>
+          <dbf-mobile-link href="/" variant="ghost">Home</dbf-mobile-link>
+          <dbf-mobile-link href="/profile" variant="ghost">Profile</dbf-mobile-link>
+          <dbf-mobile-link href="/settings" variant="ghost">Settings</dbf-mobile-link>
+        </dbf-mobile-toolbar>
+      </footer>
+    </main>
+  </body>
+</html>
