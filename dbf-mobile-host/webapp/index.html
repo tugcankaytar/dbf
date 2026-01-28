@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DBF Mobile Demo</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="header">
+        <h1>DBF Mobile Demo</h1>
+        <button id="ready-btn">ready()</button>
+      </header>
+      <section class="grid">
+        <button data-action="storage-set">Storage set</button>
+        <button data-action="storage-get">Storage get</button>
+        <button data-action="secure-set">Secure set</button>
+        <button data-action="secure-get">Secure get</button>
+        <button data-action="device-info">Device info</button>
+        <button data-action="device-locale">Device locale</button>
+        <button data-action="device-network">Device network</button>
+        <button data-action="deeplink">Deeplink initial</button>
+        <button data-action="notif-permission">Notif permission</button>
+        <button data-action="notif-token">Notif token</button>
+      </section>
+      <section class="log" id="log"></section>
+    </main>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

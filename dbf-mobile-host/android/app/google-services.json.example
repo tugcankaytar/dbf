@@ -1,0 +1,22 @@
+{
+  "project_info": {
+    "project_number": "1234567890",
+    "project_id": "dbf-mobile-host",
+    "storage_bucket": "dbf-mobile-host.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1234567890:android:abcdef",
+        "android_client_info": {
+          "package_name": "com.dbf.mobile"
+        }
+      },
+      "api_key": [
+        {
+          "current_key": "REPLACE_WITH_FCM_KEY"
+        }
+      ]
+    }
+  ]
+}
